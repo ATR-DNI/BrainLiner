@@ -20,11 +20,11 @@ interface APIDataProvider<T> {
    /**
     * 
     * @param from - index to start reading data from
-    * @param to - index (exclusive) to read data to
+    * @param count - number of data to read
     * @return the data from the <code>from</code> index to the <code>to</code> 
     * index, exclusive. If <code>to</code> is greater than the size, only data 
     * up to the end of the data set will be returned, without any exception 
     * being thrown
     */
-   public List<T> getData(int from, int to);
+   public List<T> getData(int from, int count);
 }

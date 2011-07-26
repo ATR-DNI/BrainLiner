@@ -35,9 +35,9 @@ final class NSNAnalogDataProvider implements APIDataProvider {
    }
 
    @Override
-   public synchronized List<Double> getData(int from, int to) {
+   public synchronized List<Double> getData(int from, int count) {
       ArrayList<Double> data = new ArrayList<Double>();
-      int count = 0;
+      int num = 0;
       int iter = 0;
 
       long itemCount = entity.getEntityInfo().getItemCount();
@@ -46,14 +46,14 @@ final class NSNAnalogDataProvider implements APIDataProvider {
          from = (int) (itemCount - 1);
       }
 
-      if (to > itemCount) {
-         to = (int) (itemCount - 1);
+      if ((from + count) > itemCount) {
+         count = (int) (itemCount - from);
       }
       try {
          RandomAccessFile file = new RandomAccessFile(filePath, "r");
          file.seek(byteOffset);
 
-         while (count < itemCount) {
+         while (num < itemCount) {
 
             ReaderUtils.readDouble(file);
             this.dataCount = ReaderUtils.readUnsignedInt(file);
@@ -62,13 +62,13 @@ final class NSNAnalogDataProvider implements APIDataProvider {
             if (iter == segmentNum) {
                for (int valNDX = 0; valNDX < dataCount; valNDX++) {
                   data.add(ReaderUtils.readDouble(file));
-                  count++;
+                  num++;
                }
                break;
             } else {
                //skip this data
                file.seek(file.getFilePointer() + (ConstantValues.CHAR64_LENGTH * dataCount));
-               count += dataCount;
+               num += dataCount;
             }
 
             iter++;
