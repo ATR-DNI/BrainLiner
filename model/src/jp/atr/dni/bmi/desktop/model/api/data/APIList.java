@@ -22,9 +22,9 @@ public final class APIList<E> {
    /** Data provider for this APIList. */
    private APIDataProvider<E> dataProvider;
    /** The starting index for data that is currently in the cache.*/
-   private int startIndex;
+   private int startIndex = -1;
    /** The ending index for data that is currently in the cache. */
-   private int endIndex;
+   private int endIndex = -1;
    /** The maximum size of the data cache that is stored in memory. */
    private static final int CACHE_SIZE = 5000;
    /** The cache of data that is loaded into memory. */

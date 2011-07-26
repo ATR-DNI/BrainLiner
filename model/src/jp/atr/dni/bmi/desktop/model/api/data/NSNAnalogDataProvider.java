@@ -37,7 +37,7 @@ final class NSNAnalogDataProvider implements APIDataProvider {
 
    @Override
    public synchronized List<Double> getData(int from, int to) {
-//      System.out.println("data faulting!!!" + faultNum++);
+      System.out.println("data faulting!!!" + faultNum++);
 
       ArrayList<Double> data = new ArrayList<Double>();
       int count = 0;
@@ -67,7 +67,7 @@ final class NSNAnalogDataProvider implements APIDataProvider {
 
                file.seek(file.getFilePointer() + (ConstantValues.DOUBLE_BYTE_SIZE * from));
 
-//               System.out.println("from: " + from + "\tto: " + to + "\tdataCount: " + dataCount);
+               System.out.println("from: " + from + "\tto: " + to + "\tdataCount: " + dataCount);
 
                for (int valNDX = from; valNDX <= to; valNDX++) {
                   data.add(ReaderUtils.readDouble(file));

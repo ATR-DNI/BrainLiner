@@ -548,7 +548,7 @@ public final class TimelineTopComponent extends TopComponent implements GLEventL
       gl.glClear(GL2.GL_COLOR_BUFFER_BIT);
       gl.glClearColor(1, 1, 1, 1);
 
-      if (workspace.numChannels() < 1) {
+      if (viewerChannels.size() < 1) {
          return;
       }
 
@@ -600,13 +600,15 @@ public final class TimelineTopComponent extends TopComponent implements GLEventL
       int yMin = (int) (minPoint.getY() < 0 ? 0 : Math.abs(minPoint.getY()) / Y_SPACER);
       int yMax = (int) Math.abs(maxPoint.getY()) / Y_SPACER + 1;
 
-      if (yMax > workspace.numChannels()) {
-         yMax = workspace.numChannels();
+      if (yMax > viewerChannels.size()) {
+         yMax = viewerChannels.size();
       }
 
       //draw data
       yOffset = yMin;
-      for (ViewerChannel vc : viewerChannels) {
+      for (int channelNDX = yMin; channelNDX < yMax; channelNDX++) {
+
+         ViewerChannel vc = viewerChannels.get(channelNDX);
 
          if (vc.getType() == ChannelType.ANALOG) {
             double timeIncrement = 1000.0 / vc.getSamplingRate();
@@ -675,7 +677,7 @@ public final class TimelineTopComponent extends TopComponent implements GLEventL
          if (tSize > .15) {
             tSize = .15f;
          }
-         drawTextUnscaled(gl, workspace.getChannel(i).getLabel(), SCROLLBAR_HEIGHT, p.getY(), tSize, 2.0f);
+         drawTextUnscaled(gl, viewerChannels.get(i).getLabel(), SCROLLBAR_HEIGHT, p.getY(), tSize, 2.0f);
       }
 
       //Calculate screen area for data
