@@ -53,7 +53,7 @@ public final class APIList<E> {
       if (changes.containsKey(ndx)) {
          return changes.get(ndx);
       } else if (ndx >= 0 && ndx < this.size) {
-         if (ndx >= startIndex && ndx < endIndex && cache != null) {
+         if (ndx >= startIndex && ndx <= endIndex && cache != null) {
             return cache.get(ndx - startIndex);
          } else {
             //DataFault
@@ -63,7 +63,6 @@ public final class APIList<E> {
                endIndex = this.size - 1;
             }
             cache = dataProvider.getData(startIndex, endIndex);
-            System.out.println("returned data: " + cache);
 
             return cache.get(ndx - startIndex);
          }
