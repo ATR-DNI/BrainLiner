@@ -74,6 +74,9 @@ public class ConstantValues {
     *
     */
    public static final int CHAR128_LENGTH = 128;
+   
+   public static final int DOUBLE_BYTE_SIZE = 8;
+   
    /**
     *
     */

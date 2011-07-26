@@ -57,7 +57,7 @@ public final class NSNAnalogData implements APIData {
             values.add(vals);
 
             //Skip all the data for now. Read it in through the data provider only as-needed. 
-            file.seek(file.getFilePointer() + (ConstantValues.CHAR64_LENGTH * dataCount));
+            file.seek(file.getFilePointer() + (ConstantValues.DOUBLE_BYTE_SIZE * dataCount));
             count += dataCount;
             segmentNum++;
          }

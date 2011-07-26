@@ -37,7 +37,7 @@ final class NSNAnalogDataProvider implements APIDataProvider {
 
    @Override
    public synchronized List<Double> getData(int from, int to) {
-      System.out.println("data faulting!!!" + faultNum++);
+//      System.out.println("data faulting!!!" + faultNum++);
 
       ArrayList<Double> data = new ArrayList<Double>();
       int count = 0;
@@ -54,8 +54,6 @@ final class NSNAnalogDataProvider implements APIDataProvider {
             ReaderUtils.readDouble(file);
             dataCount = ReaderUtils.readUnsignedInt(file);
 
-            file.seek(file.getFilePointer() + (ConstantValues.CHAR64_LENGTH * from));
-
             ArrayList<Double> values = new ArrayList<Double>();
 
             if (iter == segmentNum) {
@@ -67,6 +65,10 @@ final class NSNAnalogDataProvider implements APIDataProvider {
                   to = (int) (dataCount - 1);
                }
 
+               file.seek(file.getFilePointer() + (ConstantValues.DOUBLE_BYTE_SIZE * from));
+
+//               System.out.println("from: " + from + "\tto: " + to + "\tdataCount: " + dataCount);
+
                for (int valNDX = from; valNDX <= to; valNDX++) {
                   data.add(ReaderUtils.readDouble(file));
                   count++;
@@ -74,7 +76,7 @@ final class NSNAnalogDataProvider implements APIDataProvider {
                break;
             } else {
                //skip this data
-               file.seek(file.getFilePointer() + (ConstantValues.CHAR64_LENGTH * dataCount));
+               file.seek(file.getFilePointer() + (ConstantValues.DOUBLE_BYTE_SIZE * dataCount));
                count += dataCount;
             }
 
@@ -82,6 +84,7 @@ final class NSNAnalogDataProvider implements APIDataProvider {
          }
          file.close();
       } catch (Exception err) {
+         System.out.println("crazy error: ");
          err.printStackTrace();
       }
       return data;
@@ -104,7 +107,7 @@ final class NSNAnalogDataProvider implements APIDataProvider {
                break;
             }
             //skip this data
-            file.seek(file.getFilePointer() + (ConstantValues.CHAR64_LENGTH * dataCount));
+            file.seek(file.getFilePointer() + (ConstantValues.DOUBLE_BYTE_SIZE * dataCount));
             count += dataCount;
             iter++;
          }

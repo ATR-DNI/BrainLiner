@@ -20,7 +20,7 @@ interface APIDataProvider<T> {
    /**
     * 
     * @param from - index to start reading data from
-    * @param count - index to start reading data to
+    * @param to - index to reading data to
     * @return the data from the <code>from</code> index to the <code>to</code> 
     * index, exclusive. If <code>to</code> is greater than the size, only data 
     * up to the end of the data set will be returned, without any exception 

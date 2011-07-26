@@ -68,7 +68,6 @@ public final class APIList<E> {
             return cache.get(ndx - startIndex);
          }
       }
-      //      data.
 
       /*if (data.containsKey(ndx)) {
       return data.get(ndx);
@@ -113,9 +112,9 @@ public final class APIList<E> {
     * @param ndx
     * @return 
     */
-   public synchronized boolean remove(int ndx) {
+   public synchronized void remove(int ndx) {
 //      data.remove(ndx);
-      return true;
+      //TODO:!
    }
 
    /**
