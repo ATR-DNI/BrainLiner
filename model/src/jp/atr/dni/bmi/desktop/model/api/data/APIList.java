@@ -19,20 +19,27 @@ public final class APIList<E> {
     * similiar to page faults in memory.
    TODO: use this to grow/shrink the data chunk size*/
 //    private int dataFaults;
+   /** Data provider for this APIList. */
    private APIDataProvider<E> dataProvider;
-   //Inclusive
+   /** The starting index for data that is currently in the cache.*/
    private int startIndex;
-   //Exclusive
-   private int maxIndex;
-   private static final int INCR_SIZE = 5000;
-   private List<E> data;
-   
+   /** The ending index for data that is currently in the cache. */
+   private int endIndex;
+   /** The maximum size of the data cache that is stored in memory. */
+   private static final int CACHE_SIZE = 5000;
+   /** The cache of data that is loaded into memory. */
+   private List<E> cache;
+   /** Map of data that has been changed, from index to datum. */
    private HashMap<Integer, E> changes;
-//   private HashMap<Integer, E> data;
-//    private APIListIterator<E> listIterator;
 
+//    private APIListIterator<E> listIterator;
 //    private cache
    //private victimCache
+   /** 
+    * Constructor. 
+    * 
+    * @param dataProvider - data provider for this APIList
+    */
    public APIList(APIDataProvider<E> dataProvider) {
       this.dataProvider = dataProvider;
       this.size = dataProvider.size();
@@ -43,16 +50,22 @@ public final class APIList<E> {
     * @return the data at index ndx
     */
    public synchronized E get(int ndx) {
-      if (ndx >= 0 && ndx < this.size) {
-         if (ndx >= startIndex && ndx < maxIndex && data != null) {
-            return data.get(ndx - startIndex);
+      if (changes.containsKey(ndx)) {
+         return changes.get(ndx);
+      } else if (ndx >= 0 && ndx < this.size) {
+         if (ndx >= startIndex && ndx < endIndex && cache != null) {
+            return cache.get(ndx - startIndex);
          } else {
             //DataFault
             startIndex = ndx;
-            maxIndex = startIndex + INCR_SIZE;
-            data = dataProvider.getData(startIndex, maxIndex);
-            
-            return data.get(ndx - startIndex);
+            endIndex = startIndex + CACHE_SIZE;
+            if (endIndex >= this.size) {
+               endIndex = this.size - 1;
+            }
+            cache = dataProvider.getData(startIndex, endIndex);
+            System.out.println("returned data: " + cache);
+
+            return cache.get(ndx - startIndex);
          }
       }
       //      data.
@@ -66,15 +79,26 @@ public final class APIList<E> {
       dataProvider.getData(ndx, ndx + 5000);
       //            dataFaults++;
       }*/
-      
+
       return null;
    }
-   
-   public synchronized void set(int ndx, E e) {    
+
+   /**
+    * Changes the data.
+    * 
+    * @param ndx - index of datum to change
+    * @param e - datum to change
+    */
+   public synchronized void set(int ndx, E e) {
       changes.put(ndx, e);
       //TODO: offload changes to the disk once this gets too big
    }
-   
+
+   /**
+    * 
+    * 
+    * @param e 
+    */
    public synchronized void add(E e) {
       changes.put(size++, e);
       //TODO: offload changes to the disk once this gets too big
@@ -84,11 +108,20 @@ public final class APIList<E> {
 //      //First search for the object, then remove it
 //      
 //   }
+   /**
+    * 
+    * @param ndx
+    * @return 
+    */
    public synchronized boolean remove(int ndx) {
 //      data.remove(ndx);
       return true;
    }
-   
+
+   /**
+    * 
+    * @return 
+    */
    public synchronized int size() {
       return size;
    }

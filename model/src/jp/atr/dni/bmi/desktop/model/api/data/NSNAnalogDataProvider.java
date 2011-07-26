@@ -19,6 +19,7 @@ final class NSNAnalogDataProvider implements APIDataProvider {
    private long byteOffset;
    private long dataCount;
    private AnalogInfo entity;
+   int faultNum = 0;
 
    public NSNAnalogDataProvider(int segmentNum, AnalogInfo nsnEntity) {
       entity = nsnEntity;
@@ -35,40 +36,46 @@ final class NSNAnalogDataProvider implements APIDataProvider {
    }
 
    @Override
-   public synchronized List<Double> getData(int from, int count) {
+   public synchronized List<Double> getData(int from, int to) {
+      System.out.println("data faulting!!!" + faultNum++);
+
       ArrayList<Double> data = new ArrayList<Double>();
-      int num = 0;
+      int count = 0;
       int iter = 0;
 
       long itemCount = entity.getEntityInfo().getItemCount();
 
-      if (from > itemCount) {
-         from = (int) (itemCount - 1);
-      }
-
-      if ((from + count) > itemCount) {
-         count = (int) (itemCount - from);
-      }
       try {
          RandomAccessFile file = new RandomAccessFile(filePath, "r");
          file.seek(byteOffset);
 
-         while (num < itemCount) {
-
+         int x = 0;
+         while (count < itemCount) {
             ReaderUtils.readDouble(file);
-            this.dataCount = ReaderUtils.readUnsignedInt(file);
+            dataCount = ReaderUtils.readUnsignedInt(file);
+
+            file.seek(file.getFilePointer() + (ConstantValues.CHAR64_LENGTH * from));
+
             ArrayList<Double> values = new ArrayList<Double>();
 
             if (iter == segmentNum) {
-               for (int valNDX = 0; valNDX < dataCount; valNDX++) {
+               if (from > dataCount) {
+                  from = (int) (dataCount - 1);
+               }
+
+               if (to > dataCount) {
+                  to = (int) (dataCount - 1);
+               }
+
+               for (int valNDX = from; valNDX <= to; valNDX++) {
                   data.add(ReaderUtils.readDouble(file));
-                  num++;
+                  count++;
                }
                break;
             } else {
                //skip this data
                file.seek(file.getFilePointer() + (ConstantValues.CHAR64_LENGTH * dataCount));
-               num += dataCount;
+               count += dataCount;
             }
 
             iter++;
