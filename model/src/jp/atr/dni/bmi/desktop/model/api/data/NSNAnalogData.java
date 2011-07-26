@@ -4,7 +4,6 @@ import java.io.RandomAccessFile;
 import java.util.ArrayList;
 import jp.atr.dni.bmi.desktop.neuroshareutils.AnalogInfo;
 import jp.atr.dni.bmi.desktop.neuroshareutils.ConstantValues;
-import jp.atr.dni.bmi.desktop.neuroshareutils.Constants;
 import jp.atr.dni.bmi.desktop.neuroshareutils.ReaderUtils;
 
 /**
@@ -20,11 +19,19 @@ public final class NSNAnalogData implements APIData {
    private ArrayList<Double> timeStamps;
    private ArrayList<APIList<Double>> values;
 
+   /**
+    * Constructor. 
+    * 
+    * @param nsnEntity - the neuroshare entity underlying this channel's data
+    */
    public NSNAnalogData(AnalogInfo nsnEntity) {
       this.nsnEntity = nsnEntity;
       initializeData();
    }
 
+   /**
+    * This method initializes the data for the AnalogChannel. It creates a new APIList and data provider for each segment of data.
+    */
    private void initializeData() {
       timeStamps = new ArrayList<Double>();
       values = new ArrayList<APIList<Double>>();
@@ -38,7 +45,6 @@ public final class NSNAnalogData implements APIData {
       try {
          RandomAccessFile file = new RandomAccessFile(filePath, "r");
          file.seek(byteOffset);
-//         System.out.println("itemcount: " + itemCount);
 
          int segmentNum = 0;
          while (count < itemCount) {
@@ -47,7 +53,6 @@ public final class NSNAnalogData implements APIData {
             timeStamps.add(timeStamp);
 
             long dataCount = ReaderUtils.readUnsignedInt(file);
-//            System.out.println("datacount: " + dataCount);
             APIList<Double> vals = new APIList<Double>(new NSNAnalogDataProvider(segmentNum, nsnEntity));
             values.add(vals);
 
@@ -55,10 +60,6 @@ public final class NSNAnalogData implements APIData {
             file.seek(file.getFilePointer() + (ConstantValues.CHAR64_LENGTH * dataCount));
             count += dataCount;
             segmentNum++;
-//            for (int valNDX = 0; valNDX < dataCount; valNDX++) {
-//               vals.add(ReaderUtils.readDouble(file));
-//               count++;
-//            }
          }
          file.close();
       } catch (Exception err) {

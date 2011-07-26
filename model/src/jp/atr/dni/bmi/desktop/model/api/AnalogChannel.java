@@ -8,7 +8,7 @@ import jp.atr.dni.bmi.desktop.neuroshareutils.AnalogInfo;
  * @author Makoto Takemiya - [武宮 誠] <br />
  * <a href="http://www.atr.jp">ATR - [株式会社・国際電氣通信基礎技術研究所]</a>
  *
- * @version 2011/07/22
+ * @version 2011/07/26
  */
 public final class AnalogChannel implements Channel<NSNAnalogData> {
 
