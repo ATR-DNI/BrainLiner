@@ -1,5 +1,7 @@
 package jp.atr.dni.bmi.desktop.model.api.data;
 
+import jp.atr.dni.bmi.desktop.neuroshareutils.EventInfo;
+
 /**
  *
  * @author makoto
@@ -7,6 +9,12 @@ package jp.atr.dni.bmi.desktop.model.api.data;
 public final class NSNEventData implements APIData {
 
    private APIList<NSNEvent> events;
+
+    public NSNEventData(EventInfo nsnEntity) {
+        // Create Data List.
+        events = new APIList<NSNEvent>(new NSNEventDataProvider(0, nsnEntity));
+        
+    }
 
    /**
     * @return the events
