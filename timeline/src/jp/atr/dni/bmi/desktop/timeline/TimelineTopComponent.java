@@ -591,7 +591,7 @@ public final class TimelineTopComponent extends TopComponent implements GLEventL
       gl.glBegin(GL.GL_LINES);
 
       double yOffset = 0;
-      double maxX = 0;
+//      double maxX = 0;
       double prevY = 0;
 
       int yMin = (int) (minPoint.getY() < 0 ? 0 : Math.abs(minPoint.getY()) / Y_SPACER);
@@ -616,7 +616,7 @@ public final class TimelineTopComponent extends TopComponent implements GLEventL
 //            System.out.println("label: " + vc.getLabel() + "\tsize: " + vals.size());
 
             double prevX = minPoint.getX() > 2 ? (int) minPoint.getX() - 1 : 0;
-            prevX /= timeIncrement;
+//            prevX /= timeIncrement;
             prevX = prevX % 2 == 0 ? prevX : prevX - 1;
 
             int xLimit = (int) (maxPoint.getX() / timeIncrement);
@@ -633,7 +633,6 @@ public final class TimelineTopComponent extends TopComponent implements GLEventL
                prevY = ((vals.get(ndx) - vc.getSubtractor()) / vc.getNormalizer()) - yOffset * Y_SPACER;
             }
             ndx = ndx % 2 == 0 ? ndx : ndx - 1;
-//            ndx = 0;
 
             boolean drawed = false;
             for (; ndx < xLimit; ndx++) {
@@ -653,10 +652,6 @@ public final class TimelineTopComponent extends TopComponent implements GLEventL
             if (drawed && ndx % 2 != 0) {
                Point2D p = getScreenCoordinates(prevX, prevY);
                gl.glVertex2d(p.getX(), p.getY());
-            }
-
-            if (xVal > maxX) {
-               maxX = xVal;
             }
             yOffset++;
          }
