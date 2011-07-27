@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<module codename="jp.atr.dni.bmi.desktop.model">
-    <module_version install_time="1311726143743" last="true" origin="installer" specification_version="1.0">
-        <file crc="2968498050" name="config/Modules/jp-atr-dni-bmi-desktop-model.xml"/>
-        <file crc="28241745" name="modules/ext/commons-collections-3.2.1.jar"/>
-        <file crc="4040993274" name="modules/ext/guava-r09.jar"/>
-        <file crc="525927256" name="modules/jp-atr-dni-bmi-desktop-model.jar"/>
-    </module_version>
-</module>

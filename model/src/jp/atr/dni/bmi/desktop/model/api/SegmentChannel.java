@@ -20,7 +20,7 @@ public final class SegmentChannel implements Channel<NSNSegmentData> {
       this.id = id;
       this.nsnEntity = nsnEntity;
       data = new NSNSegmentData();
-      segmentSources.add(null);
+//      segmentSources.add(null);
    }
 
    @Override

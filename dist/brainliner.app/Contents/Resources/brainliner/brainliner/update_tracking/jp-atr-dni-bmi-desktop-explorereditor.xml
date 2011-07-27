@@ -1,8 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<module codename="jp.atr.dni.bmi.desktop.explorereditor">
-    <module_version install_time="1311726143930" last="true" origin="installer" specification_version="1.0">
-        <file crc="2794770368" name="config/Modules/jp-atr-dni-bmi-desktop-explorereditor.xml"/>
-        <file crc="3973900425" name="modules/ext/commons-io-2.0.1.jar"/>
-        <file crc="1869270219" name="modules/jp-atr-dni-bmi-desktop-explorereditor.jar"/>
-    </module_version>
-</module>

@@ -592,9 +592,6 @@ public final class TimelineTopComponent extends TopComponent implements GLEventL
 
       double yOffset = 0;
       double maxX = 0;
-
-
-
       double prevY = 0;
 
       int yMin = (int) (minPoint.getY() < 0 ? 0 : Math.abs(minPoint.getY()) / Y_SPACER);
@@ -636,6 +633,7 @@ public final class TimelineTopComponent extends TopComponent implements GLEventL
                prevY = ((vals.get(ndx) - vc.getSubtractor()) / vc.getNormalizer()) - yOffset * Y_SPACER;
             }
             ndx = ndx % 2 == 0 ? ndx : ndx - 1;
+//            ndx = 0;
 
             boolean drawed = false;
             for (; ndx < xLimit; ndx++) {
