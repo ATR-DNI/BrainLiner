@@ -4,38 +4,21 @@ package jp.atr.dni.bmi.desktop.model.api.data;
  *
  * @author makoto
  */
-public  final class NSNEventData implements APIData {
+public final class NSNEventData implements APIData {
 
-    private APIList<Double> timeStamps;
-    private APIList<Object> values;
+   private APIList<NSNEvent> events;
 
-    /**
-     * @return the timeStamps
-     */
-    public APIList<Double> getTimeStamps() {
-        return timeStamps;
-    }
+   /**
+    * @return the events
+    */
+   public APIList<NSNEvent> getEvents() {
+      return events;
+   }
 
-    /**
-     * @param timeStamps the timeStamps to set
-     */
-    public void setTimeStamps(APIList<Double> timeStamps) {
-        this.timeStamps = timeStamps;
-    }
-
-    /**
-     * @return the values
-     */
-    public APIList<Object> getValues() {
-        return values;
-    }
-
-    /**
-     * @param values the values to set
-     */
-    public void setValues(APIList<Object> values) {
-        this.values = values;
-    }
-    
-    
+   /**
+    * @param events the events to set
+    */
+   public void setEvents(APIList<NSNEvent> events) {
+      this.events = events;
+   }
 }

@@ -12,6 +12,7 @@ import jp.atr.dni.bmi.desktop.model.api.SegmentChannel;
 import jp.atr.dni.bmi.desktop.model.api.data.NSNSegmentSource;
 import jp.atr.dni.bmi.desktop.model.api.data.NSNEventData;
 import jp.atr.dni.bmi.desktop.model.api.data.NSNAnalogData;
+import jp.atr.dni.bmi.desktop.model.api.data.NSNEvent;
 import jp.atr.dni.bmi.desktop.model.api.data.NSNSegmentData;
 import jp.atr.dni.bmi.desktop.model.api.data.NSNNeuralSpikeData;
 import jp.atr.dni.bmi.desktop.neuroshareutils.nsn.NSNCreateFile;
@@ -106,7 +107,7 @@ public class CreateNewNeuroshareFile {
             // Get EventData from working file.
 //                TLData tLData = nsCsvReader.getTLData(srcFileFullPath);
             NSNEventData timeLabelData = channel.getData();
-            int eventDataSize = timeLabelData.getTimeStamps().size();
+            int eventDataSize = timeLabelData.getEvents().size();
 
             long eventType = channel.getEntityType();
 
@@ -114,7 +115,8 @@ public class CreateNewNeuroshareFile {
                // Get Event Data
                for (int ii = 0; ii < eventDataSize; ii++) {
                   // ns_EVENT_TEXT
-                  rtnval2 = nsEd.addEventData(timeLabelData.getTimeStamps().get(ii), timeLabelData.getValues().get(ii).toString());
+                  NSNEvent event = timeLabelData.getEvents().get(ii);
+                  rtnval2 = nsEd.addEventData(event.getTimestamp(), event.getValue().toString());
                   if (rtnval2 != 0) {
                      // add error. - input arg error - or intermediate file i/o error.
                   }
@@ -124,7 +126,8 @@ public class CreateNewNeuroshareFile {
                for (int ii = 0; ii < eventDataSize; ii++) {
                   // ns_EVENT_BYTE
 //                                    rtnval2 = nsEd.addEventData(tLData.getTimeStamp(ii), (Byte) (tLData.getValue(ii)));
-                  rtnval2 = nsEd.addEventData(timeLabelData.getTimeStamps().get(ii), Byte.parseByte((String) timeLabelData.getValues().get(ii)));
+                  NSNEvent event = timeLabelData.getEvents().get(ii);
+                  rtnval2 = nsEd.addEventData(event.getTimestamp(), Byte.parseByte((String) event.getValue()));
                   if (rtnval2 != 0) {
                      // add error. - input arg error - or intermediate file i/o error.
                   }
@@ -133,7 +136,8 @@ public class CreateNewNeuroshareFile {
                for (int ii = 0; ii < eventDataSize; ii++) {
                   // ns_EVENT_WORD
 //                                    rtnval2 = nsEd.addEventData(tLData.getTimeStamp(ii), (Short) (tLData.getValue(ii)));
-                  rtnval2 = nsEd.addEventData(timeLabelData.getTimeStamps().get(ii), Short.parseShort((String) timeLabelData.getValues().get(ii)));
+                  NSNEvent event = timeLabelData.getEvents().get(ii);
+                  rtnval2 = nsEd.addEventData(event.getTimestamp(), Short.parseShort((String) event.getValue()));
                   if (rtnval2 != 0) {
                      // add error. - input arg error - or intermediate file i/o error.
                   }
@@ -142,7 +146,8 @@ public class CreateNewNeuroshareFile {
                for (int ii = 0; ii < eventDataSize; ii++) {
                   // ns_EVENT_DWORD
 //                                    rtnval2 = nsEd.addEventData(tLData.getTimeStamp(ii), (Integer) (tLData.getValue(ii)));
-                  rtnval2 = nsEd.addEventData(timeLabelData.getTimeStamps().get(ii), Integer.parseInt((String) timeLabelData.getValues().get(ii)));
+                  NSNEvent event = timeLabelData.getEvents().get(ii);
+                  rtnval2 = nsEd.addEventData(event.getTimestamp(), Integer.parseInt((String) event.getValue()));
                   if (rtnval2 != 0) {
                      // add error. - input arg error - or intermediate file i/o error.
                   }
@@ -280,8 +285,7 @@ public class CreateNewNeuroshareFile {
             }
 
             // Modify members.
-            APIList<NSNSegmentSource> segSources = channel.getSegmentSources();
-            NSNSegmentSource segSource = segSources.get(0);
+            NSNSegmentSource segSource = channel.getSegmentSource(0);
 
             nsaSegSourceInfo.setDResolution(segSource.getResolution());
             // nsaSegSourceInfo.setDMinVal(3.0); // [Can Edit, ***But not recommend to modify

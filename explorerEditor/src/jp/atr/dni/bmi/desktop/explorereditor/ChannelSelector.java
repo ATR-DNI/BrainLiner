@@ -472,15 +472,17 @@ public class ChannelSelector extends javax.swing.JPanel implements ActionListene
             Object obj = this.selectedChannelList.get(i);
             Channel ch = (Channel) obj;
 
+
             // Delete multiple SegSourceInfos.(i.e. Application retains only first SegSourceInfo.)
             if (ch.getType() == ChannelType.SEGMENT) {//TI
                // Segment Entity.
                SegmentChannel segChannel = (SegmentChannel) ch;
-               APIList<NSNSegmentSource> segSourceInfos = segChannel.getSegmentSources();
-               int size = segSourceInfos.size();
+//               APIList<NSNSegmentSource> segSourceInfos = segChannel.getSegmentSources();
+               int size = (int) segChannel.numSegSources();
                if (size >= 2) {
                   for (int j = 1; j < size; j++) {
-                     segSourceInfos.remove(segSourceInfos.size() - 1);
+                     segChannel.removeSegmentSource(j);
+//                     segSourceInfos.remove(segSourceInfos.size() - 1);
                   }
 //                        segChannel.setSegmentSources(segSourceInfos);//does nothing since the list has already been modified
 
@@ -488,7 +490,7 @@ public class ChannelSelector extends javax.swing.JPanel implements ActionListene
 
                   JOptionPane.showMessageDialog(null, "Channel: " + ch.getLabel() + " - Extra ns_SegSourceInfos were skipped!");
                }
-               segChannel.setSegmentSources(segSourceInfos);
+//               segChannel.setSegmentSources(segSourceInfos);
             }
             channels[i] = ch;
          }

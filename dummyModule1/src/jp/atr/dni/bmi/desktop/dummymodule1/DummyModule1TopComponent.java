@@ -16,6 +16,7 @@ import jp.atr.dni.bmi.desktop.model.api.SegmentChannel;
 import jp.atr.dni.bmi.desktop.model.api.Workspace;
 import jp.atr.dni.bmi.desktop.model.api.data.NSNEventData;
 import jp.atr.dni.bmi.desktop.model.api.data.NSNAnalogData;
+import jp.atr.dni.bmi.desktop.model.api.data.NSNEvent;
 import jp.atr.dni.bmi.desktop.model.api.data.NSNSegmentData;
 import jp.atr.dni.bmi.desktop.model.api.data.NSNNeuralSpikeData;
 import org.openide.util.NbBundle;
@@ -407,18 +408,17 @@ public final class DummyModule1TopComponent extends TopComponent implements Prop
          EventChannel evtChannel = (EventChannel) channel;
          NSNEventData timeLabelData = evtChannel.getData();
 
-         APIList<Object> values = timeLabelData.getValues();
-         APIList<Double> timeStamps = timeLabelData.getTimeStamps();
+         APIList<NSNEvent> events = timeLabelData.getEvents();
 
          defaultListModel.addElement("------- TS_AND_LABEL Data --------");
 
-         for (int ii = 0; ii < timeStamps.size(); ii++) {
+         for (int i = 0; i < events.size(); i++) {
 
             // Display timestamp.
             defaultListModel.addElement("------ timestamp ------");
-            defaultListModel.addElement(timeStamps.get(ii));
+            defaultListModel.addElement(events.get(i).getTimestamp());
             defaultListModel.addElement("------ value ----------");
-            defaultListModel.addElement(values.get(ii));
+            defaultListModel.addElement(events.get(i).getValue());
             defaultListModel.addElement("-----------------------");
          }
       }

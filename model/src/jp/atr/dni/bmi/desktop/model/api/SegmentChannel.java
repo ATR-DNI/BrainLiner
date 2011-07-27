@@ -1,6 +1,7 @@
 package jp.atr.dni.bmi.desktop.model.api;
 
-import jp.atr.dni.bmi.desktop.model.api.data.APIList;
+import java.util.ArrayList;
+import java.util.List;
 import jp.atr.dni.bmi.desktop.model.api.data.NSNSegmentSource;
 import jp.atr.dni.bmi.desktop.model.api.data.NSNSegmentData;
 import jp.atr.dni.bmi.desktop.neuroshareutils.SegmentInfo;
@@ -14,7 +15,7 @@ public final class SegmentChannel implements Channel<NSNSegmentData> {
    private int id;
    private SegmentInfo nsnEntity;
    private NSNSegmentData data;
-   private APIList<NSNSegmentSource> segmentSources;
+   private List<NSNSegmentSource> segmentSources = new ArrayList<NSNSegmentSource>();
 
    public SegmentChannel(int id, SegmentInfo nsnEntity) {
       this.id = id;
@@ -156,24 +157,40 @@ public final class SegmentChannel implements Channel<NSNSegmentData> {
       return nsnEntity.getEntityInfo().getEntityType();
    }
 
-   /**
-    * @param entityType the entityType to set
-    */
-   public void setEntityType(long entityType) {
-      nsnEntity.getEntityInfo().setEntityType(entityType);
+//   /**
+//    * @param entityType the entityType to set
+//    */
+//   public void setEntityType(long entityType) {
+//      nsnEntity.getEntityInfo().setEntityType(entityType);
+//   }
+//
+//   /**
+//    * @return the segmentSources
+//    */
+//   public APIList<NSNSegmentSource> getSegmentSources() {
+//      return segmentSources;
+//   }
+//   /**
+//    * @param segmentSources the segmentSources to set
+//    */
+//   public void setSegmentSources(APIList<NSNSegmentSource> segmentSources) {
+//   }
+   public synchronized NSNSegmentSource getSegmentSource(int ndx) {
+      if (ndx > 0 && ndx < segmentSources.size()) {
+         return segmentSources.get(ndx);
+      } else {
+         return null;
+      }
    }
 
-   /**
-    * @return the segmentSources
-    */
-   public APIList<NSNSegmentSource> getSegmentSources() {
-      return segmentSources;
+   public synchronized void removeSegmentSource(int ndx) {
+      if (ndx > 0 && ndx < segmentSources.size()) {
+         segmentSources.remove(ndx);
+      }
    }
 
-   /**
-    * @param segmentSources the segmentSources to set
-    */
-   public void setSegmentSources(APIList<NSNSegmentSource> segmentSources) {
+   public synchronized int numSegSources() {
+      return segmentSources.size();
    }
 
    @Override

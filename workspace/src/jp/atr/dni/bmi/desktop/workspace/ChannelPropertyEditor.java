@@ -969,7 +969,7 @@ public class ChannelPropertyEditor extends javax.swing.JPanel implements ActionL
       } else if (channel.getType().equals(ChannelType.SEGMENT)) {
          // Segment Entity Header.
          SegmentChannel sChannel = (SegmentChannel) channel;
-         NSNSegmentSource ssi = sChannel.getSegmentSources().get(0);
+         NSNSegmentSource ssi = sChannel.getSegmentSource(0);
 
          layout.show(jPanel1, "card4");
          segmentChannelLabel.setText(sChannel.getLabel());
@@ -1103,9 +1103,8 @@ public class ChannelPropertyEditor extends javax.swing.JPanel implements ActionL
 
          sChannel.setSamplingRate(Double.parseDouble(segmentSampleRate.getText()));
          sChannel.setUnits(segmentUnit.getText());
-         APIList<NSNSegmentSource> segSources = sChannel.getSegmentSources();
+         NSNSegmentSource ssi = sChannel.getSegmentSource(0);
 
-         NSNSegmentSource ssi = segSources.get(0);
          ssi.setMinVal(Double.parseDouble(segmentMinVal.getText()));
          ssi.setMaxVal(Double.parseDouble(segmentMaxVal.getText()));
          ssi.setResolution(Double.parseDouble(segmentResolution.getText()));
