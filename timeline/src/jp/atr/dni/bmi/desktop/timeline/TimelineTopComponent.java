@@ -557,8 +557,6 @@ public final class TimelineTopComponent extends TopComponent implements GLEventL
 
       glCanvas.setSize(width, height);
 
-
-
       gl.glMatrixMode(GL2.GL_PROJECTION);
 //        gl.glLoadIdentity();
 //        gl.glOrtho(0, 640, 480, 0, -1, 1);
@@ -579,8 +577,6 @@ public final class TimelineTopComponent extends TopComponent implements GLEventL
 //                getHeight());
 
 //      gl.glViewport(0, 0, width, height);//TODO: look into this some more
-
-
 
       gl.glColor3i(0, 0, 0);
 
@@ -615,6 +611,8 @@ public final class TimelineTopComponent extends TopComponent implements GLEventL
 
             // Get TSData from the WorkingFile to display.
             APIList<Double> vals = ((NSNAnalogData) vc.getData()).getValues().get(0);
+            
+            System.out.println("label: " + vc.getLabel() + "\tsize: " + vals.size());
 
             double prevX = minPoint.getX() > 2 ? (int) minPoint.getX() - 1 : 0;
             prevX /= timeIncrement;

@@ -5,4 +5,5 @@
 <project name="BrainLiner" basedir=".">
     <description>Builds the module suite BrainLiner.</description>
     <import file="nbproject/build-impl.xml"/>
+    <property name="app.icon.icns" value="${basedir}/brainliner.icns"/>
 </project>
