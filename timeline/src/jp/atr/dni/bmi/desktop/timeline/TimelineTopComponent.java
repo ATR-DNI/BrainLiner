@@ -72,6 +72,8 @@ public final class TimelineTopComponent extends TopComponent implements GLEventL
    private double dataLowerY;
    private Point2D dataLower;
    private Point2D dataUpper;
+   private Point2D minPoint;
+   private Point2D maxPoint;
    private Date startTime;
    private Date endTime;
    private long spanX;
@@ -530,6 +532,10 @@ public final class TimelineTopComponent extends TopComponent implements GLEventL
          inverseTransform = transform.createInverse();
       } catch (Exception e) {
       }
+
+      //TODO: The following code should be moved out of render to increase performance
+      minPoint = getVirtualCoordinates(0, 0);
+      maxPoint = getVirtualCoordinates(getWidth(), getHeight());
    }
 
    /**
@@ -587,9 +593,7 @@ public final class TimelineTopComponent extends TopComponent implements GLEventL
       double yOffset = 0;
       double maxX = 0;
 
-      //TODO: The following code should be moved out of render to increase performance
-      Point2D minPoint = getVirtualCoordinates(0, 0);
-      Point2D maxPoint = getVirtualCoordinates(getWidth(), getHeight());
+
 
       double prevY = 0;
 
@@ -611,8 +615,8 @@ public final class TimelineTopComponent extends TopComponent implements GLEventL
 
             // Get TSData from the WorkingFile to display.
             APIList<Double> vals = ((NSNAnalogData) vc.getData()).getValues().get(0);
-            
-            System.out.println("label: " + vc.getLabel() + "\tsize: " + vals.size());
+
+//            System.out.println("label: " + vc.getLabel() + "\tsize: " + vals.size());
 
             double prevX = minPoint.getX() > 2 ? (int) minPoint.getX() - 1 : 0;
             prevX /= timeIncrement;

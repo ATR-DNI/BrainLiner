@@ -9,7 +9,7 @@ import java.util.List;
  * @author Makoto Takemiya - [武宮 誠] <br />
  * <a href="http://www.atr.jp">ATR - [株式会社・国際電氣通信基礎技術研究所]</a>
  *
- * @version 2011/07/25
+ * @version 2011/07/27
  */
 public final class APIList<E> {
 
@@ -26,7 +26,7 @@ public final class APIList<E> {
    /** The ending index for data that is currently in the cache. */
    private int endIndex = -1;
    /** The maximum size of the data cache that is stored in memory. */
-   private static final int CACHE_SIZE = 5000;
+   private static final int CACHE_SIZE = 15000;
    /** The cache of data that is loaded into memory. */
    private List<E> cache;
    /** Map of data that has been changed, from index to datum. */
