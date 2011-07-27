@@ -1,6 +1,8 @@
 
 package jp.atr.dni.bmi.desktop.model.api.data;
 
+import jp.atr.dni.bmi.desktop.neuroshareutils.EventInfo;
+
 /**
  * This class is just an example. Please make this an interface or abstract class to handle multiple value types (byte, csv, etc...).
  * 
