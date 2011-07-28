@@ -616,8 +616,8 @@ public final class TimelineTopComponent extends TopComponent implements GLEventL
 
 //            System.out.println("label: " + vc.getLabel() + "\tsize: " + vals.size());
 
-//            int prevX = minPoint.getX() > 2 ? (int) minPoint.getX() - 1 : 0;
-            double prevX = 0;
+            double prevX = minPoint.getX() > 2 ? (int)((minPoint.getX() - 1)/timeIncrement) : 0;
+//            double prevX = 0;
 //            prevX /= timeIncrement;
             prevX = prevX % 2 == 0 ? prevX : prevX - 1;
 

@@ -55,9 +55,9 @@ public final class APIList<E> {
          } else {
             //DataFault
             dataFaults++;
-            if (cacheSize < 100000 && dataFaults % 10 == 0) {
-               //Grow the cache size by 5000 for every 10 faults, to a max of 100,000
-               cacheSize += 5000;
+            if (cacheSize < 50000) {
+               //Grow the cache size by 500 for every faults, to a max of 50,000
+               cacheSize += 500;
             }
             startIndex = ndx;
             endIndex = startIndex + cacheSize;
