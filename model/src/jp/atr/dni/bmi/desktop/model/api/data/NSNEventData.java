@@ -12,7 +12,7 @@ public final class NSNEventData implements APIData {
 
     public NSNEventData(EventInfo nsnEntity) {
         // Create Data List.
-        events = new APIList<NSNEvent>(new NSNEventDataProvider(0, nsnEntity));
+//        events = new APIList<NSNEvent>(new NSNEventDataProvider(0, nsnEntity));
         
     }
 

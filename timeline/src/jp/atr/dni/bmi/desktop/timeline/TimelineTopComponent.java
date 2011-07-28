@@ -533,7 +533,7 @@ public final class TimelineTopComponent extends TopComponent implements GLEventL
       } catch (Exception e) {
       }
 
-      //TODO: The following code should be moved out of render to increase performance
+      //Calc the bounding points for the data-space from the screen coordinates
       minPoint = getVirtualCoordinates(0, 0);
       maxPoint = getVirtualCoordinates(getWidth(), getHeight());
    }
@@ -591,7 +591,6 @@ public final class TimelineTopComponent extends TopComponent implements GLEventL
       gl.glBegin(GL.GL_LINES);
 
       double yOffset = 0;
-//      double maxX = 0;
       double prevY = 0;
 
       int yMin = (int) (minPoint.getY() < 0 ? 0 : Math.abs(minPoint.getY()) / Y_SPACER);
@@ -611,12 +610,14 @@ public final class TimelineTopComponent extends TopComponent implements GLEventL
             double timeIncrement = 1000.0 / vc.getSamplingRate();
 
             // Get TSData from the WorkingFile to display.
+
+            //TODO: add ability to draw data after gaps!
             APIList<Double> vals = ((NSNAnalogData) vc.getData()).getValues().get(0);
 
 //            System.out.println("label: " + vc.getLabel() + "\tsize: " + vals.size());
 
             double prevX = minPoint.getX() > 2 ? (int) minPoint.getX() - 1 : 0;
-//            prevX /= timeIncrement;
+            prevX /= timeIncrement;
             prevX = prevX % 2 == 0 ? prevX : prevX - 1;
 
             int xLimit = (int) (maxPoint.getX() / timeIncrement);
@@ -633,7 +634,7 @@ public final class TimelineTopComponent extends TopComponent implements GLEventL
                prevY = ((vals.get(ndx) - vc.getSubtractor()) / vc.getNormalizer()) - yOffset * Y_SPACER;
             }
             ndx = ndx % 2 == 0 ? ndx : ndx - 1;
-
+//System.out.println("xlimit: " + xLimit + "\txVal: " + xVal + "\tprevX: " + prevX + "\tsize: " + vals.size());
             boolean drawed = false;
             for (; ndx < xLimit; ndx++) {
                drawed = true;
