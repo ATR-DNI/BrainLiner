@@ -41,8 +41,15 @@ public final class Workspace {
       fire("ChannelRemove", channel, null);
    }
 
-   public void removeChannels(List<Channel> toRemove) {
+   public void removeChannels(Collection<Channel> toRemove) {
       channels.removeAll(channels);
+      fire("ChannelsRemove", toRemove, null);
+   }
+
+   public void removeChannels(Channel[] toRemove) {
+      for (Channel c : toRemove) {
+         channels.remove(c);
+      }
       fire("ChannelsRemove", toRemove, null);
    }
 

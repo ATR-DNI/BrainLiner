@@ -181,22 +181,23 @@ public final class WorkspaceTopComponent extends TopComponent implements Propert
           int[] selectedRows = jTable1.getSelectedRows();
           int size = selectedRows.length;
 
-          // Remove from Workspace.
-          for (int i = 0; i < size; i++) {
-             Object channelObj = jTable1.getValueAt(selectedRows[size - i - 1], 0);
-             Channel channel = (Channel) channelObj;
+          if (size > 0) { // Remove from Workspace.
 
-             workspace.removeChannel(channel);
+             Channel[] toRemove = new Channel[size];
+             for (int i = 0; i < size; i++) {
+                Object channelObj = jTable1.getValueAt(selectedRows[i], 0);
+                toRemove[i] = (Channel) channelObj;
+             }
+             workspace.removeChannels(toRemove);
           }
-
           // Not call defaultTableModel.removeRow(i)!
           // PropertyChangeListener will do it.
-       } else if (selectedTabIndex == 1) {
+       } else if (selectedTabIndex
+               == 1) {
           // Supplemental Data Tab
           JOptionPane.showMessageDialog(null, "Not implemented yet.");
        }
     }//GEN-LAST:event_jButton1ActionPerformed
-
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
        // Export
        // Open wizard.
@@ -294,17 +295,25 @@ public final class WorkspaceTopComponent extends TopComponent implements Propert
     */
    public static synchronized WorkspaceTopComponent findInstance() {
       TopComponent win = WindowManager.getDefault().findTopComponent(PREFERRED_ID);
+
+
       if (win == null) {
          Logger.getLogger(WorkspaceTopComponent.class.getName()).warning(
                  "Cannot find " + PREFERRED_ID + " component. It will not be located properly in the window system.");
+
+
          return getDefault();
       }
       if (win instanceof WorkspaceTopComponent) {
          return (WorkspaceTopComponent) win;
+
+
       }
       Logger.getLogger(WorkspaceTopComponent.class.getName()).warning(
               "There seem to be multiple components with the '" + PREFERRED_ID
               + "' ID. That is a potential source of errors and unexpected behavior.");
+
+
       return getDefault();
    }
 
