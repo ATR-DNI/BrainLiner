@@ -379,9 +379,9 @@ public final class DummyModule1TopComponent extends TopComponent implements Prop
          SegmentChannel segChannel = (SegmentChannel) channel;
          NSNSegmentData timeValIdData = segChannel.getData();
 
-         APIList<APIList<Double>> values = timeValIdData.getValues();
-         APIList<Integer> unitIDs = timeValIdData.getUnitIds();
-         APIList<Double> timeStamps = timeValIdData.getTimeStamps();
+         ArrayList<APIList<Double>> values = timeValIdData.getValues();
+         ArrayList<Integer> unitIDs = timeValIdData.getUnitIDs();
+         ArrayList<Double> timeStamps = timeValIdData.getTimeStamps();
 
          defaultListModel.addElement("------- TS_AND_VAL_AND_ID Data --------");
 

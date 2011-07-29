@@ -16,7 +16,7 @@ public final class NeuralSpikeChannel implements Channel<NSNNeuralSpikeData> {
    public NeuralSpikeChannel(int id, NeuralInfo nsnEntity) {
       this.id = id;
       this.nsnEntity = nsnEntity;
-      data = new NSNNeuralSpikeData();
+      data = new NSNNeuralSpikeData(nsnEntity);
    }
 
    @Override
