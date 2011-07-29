@@ -368,7 +368,7 @@ public final class WorkspaceTopComponent extends TopComponent implements Propert
       Vector tableColumns = new Vector();
       tableColumns.add("Name");
       tableColumns.add("Type");
-      tableColumns.add("Data Count");
+//      tableColumns.add("Data Count");
       tableColumns.add("File");
       defaultTableModel1 = new DefaultTableModel(tableColumns, 0) {
          //Set all cell uneditable.
@@ -454,7 +454,7 @@ public final class WorkspaceTopComponent extends TopComponent implements Propert
       Vector newRow = new Vector();
       newRow.add(channel);
       newRow.add(type);
-      newRow.add(channel.getItemCount());
+//      newRow.add(channel.getItemCount());
       newRow.add(sourceFilePath);
 
       defaultTableModel1.addRow(newRow);
