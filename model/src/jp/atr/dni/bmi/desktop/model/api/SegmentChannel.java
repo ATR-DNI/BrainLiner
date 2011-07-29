@@ -179,7 +179,7 @@ public final class SegmentChannel implements Channel<NSNSegmentData> {
 //   public void setSegmentSources(APIList<NSNSegmentSource> segmentSources) {
 //   }
     public synchronized SegmentSourceInfo getSegmentSource(int ndx) {
-        if (ndx > 0 && ndx < segmentSources.size()) {
+        if (ndx >= 0 && ndx < segmentSources.size()) {
             return segmentSources.get(ndx);
         } else {
             return null;
@@ -187,7 +187,7 @@ public final class SegmentChannel implements Channel<NSNSegmentData> {
     }
 
     public synchronized void removeSegmentSource(int ndx) {
-        if (ndx > 0 && ndx < segmentSources.size()) {
+        if (ndx >= 0 && ndx < segmentSources.size()) {
             segmentSources.remove(ndx);
         }
     }

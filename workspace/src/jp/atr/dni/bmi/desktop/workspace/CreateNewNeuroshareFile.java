@@ -14,6 +14,7 @@ import jp.atr.dni.bmi.desktop.model.api.data.NSNAnalogData;
 import jp.atr.dni.bmi.desktop.model.api.data.NSNEvent;
 import jp.atr.dni.bmi.desktop.model.api.data.NSNSegmentData;
 import jp.atr.dni.bmi.desktop.model.api.data.NSNNeuralSpikeData;
+import jp.atr.dni.bmi.desktop.neuroshareutils.EventType;
 import jp.atr.dni.bmi.desktop.neuroshareutils.SegmentSourceInfo;
 import jp.atr.dni.bmi.desktop.neuroshareutils.nsn.NSNCreateFile;
 import jp.atr.dni.bmi.desktop.neuroshareutils.nsn.NSNNeuralEventData;
@@ -109,9 +110,9 @@ public class CreateNewNeuroshareFile {
                 NSNEventData timeLabelData = channel.getData();
                 int eventDataSize = timeLabelData.getEvents().size();
 
-                long eventType = channel.getEntityType();
+                long eventType = channel.getEventType();
 
-                if (eventType == 0) {
+                if (eventType == EventType.EVENT_TEXT.ordinal()) {
                     // Get Event Data
                     for (int ii = 0; ii < eventDataSize; ii++) {
                         // ns_EVENT_TEXT
@@ -121,7 +122,7 @@ public class CreateNewNeuroshareFile {
                             // add error. - input arg error - or intermediate file i/o error.
                         }
                     }
-                } else if (eventType == 2) {
+                } else if (eventType == EventType.EVENT_BYTE.ordinal()) {
                     // Get Event Data
                     for (int ii = 0; ii < eventDataSize; ii++) {
                         // ns_EVENT_BYTE
@@ -132,7 +133,8 @@ public class CreateNewNeuroshareFile {
                             // add error. - input arg error - or intermediate file i/o error.
                         }
                     }
-                } else if (eventType == 3) {// Get Event Data
+                } else if (eventType == EventType.EVENT_WORD.ordinal()) {
+                    // Get Event Data
                     for (int ii = 0; ii < eventDataSize; ii++) {
                         // ns_EVENT_WORD
 //                                    rtnval2 = nsEd.addEventData(tLData.getTimeStamp(ii), (Short) (tLData.getValue(ii)));
@@ -142,7 +144,7 @@ public class CreateNewNeuroshareFile {
                             // add error. - input arg error - or intermediate file i/o error.
                         }
                     }
-                } else if (eventType == 4) {// Get Event Data
+                } else if (eventType == EventType.EVENT_DWORD.ordinal()) {// Get Event Data
                     for (int ii = 0; ii < eventDataSize; ii++) {
                         // ns_EVENT_DWORD
 //                                    rtnval2 = nsEd.addEventData(tLData.getTimeStamp(ii), (Integer) (tLData.getValue(ii)));
