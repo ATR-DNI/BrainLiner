@@ -4,6 +4,8 @@
  */
 package jp.atr.dni.bmi.desktop.model.api.data;
 
+import jp.atr.dni.bmi.desktop.neuroshareutils.NeuralInfo;
+
 /**
  *
  * @author Makoto Takemiya - [武宮 誠] <br />
@@ -14,6 +16,12 @@ package jp.atr.dni.bmi.desktop.model.api.data;
 public final class NSNNeuralSpikeData implements APIData {
 
     private APIList<Double> timeStamps;
+
+    public NSNNeuralSpikeData(NeuralInfo nsnEntity) {
+        // Create Data List.
+        timeStamps = new APIList<Double>(new NSNNeuralSpikeDataProvider(0, nsnEntity));
+
+    }
 
     /**
      * @return the timeStamps

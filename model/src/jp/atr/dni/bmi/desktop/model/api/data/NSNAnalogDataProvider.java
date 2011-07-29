@@ -14,108 +14,107 @@ import jp.atr.dni.bmi.desktop.neuroshareutils.ReaderUtils;
  */
 final class NSNAnalogDataProvider implements APIDataProvider {
 
-   private int segmentNum;
-   private String filePath;
-   private long byteOffset;
-   private long dataCount;
-   private AnalogInfo entity;
-   int faultNum = 0;
+    private int segmentNum;
+    private String filePath;
+    private long byteOffset;
+    private long dataCount;
+    private AnalogInfo entity;
+    int faultNum = 0;
 
-   public NSNAnalogDataProvider(int segmentNum, AnalogInfo nsnEntity) {
-      entity = nsnEntity;
+    public NSNAnalogDataProvider(int segmentNum, AnalogInfo nsnEntity) {
+        entity = nsnEntity;
 
-      this.filePath = nsnEntity.getEntityInfo().getFilePath();
-      this.byteOffset = nsnEntity.getEntityInfo().getDataPosition();
-      this.dataCount = -1;
-   }
+        this.filePath = nsnEntity.getEntityInfo().getFilePath();
+        this.byteOffset = nsnEntity.getEntityInfo().getDataPosition();
+        this.dataCount = -1;
+    }
 
-   @Override
-   public synchronized int size() {
-      return (int) (dataCount > 0 ? dataCount
-              : getDataCount());
-   }
+    @Override
+    public synchronized int size() {
+        return (int) (dataCount > 0 ? dataCount
+                : getDataCount());
+    }
 
-   @Override
-   public synchronized List<Double> getData(int from, int to) {
-//      System.out.println("data faulting!!!" + faultNum++);
+    @Override
+    public synchronized List<Double> getData(int from, int to) {
 
-      ArrayList<Double> data = new ArrayList<Double>();
-      int count = 0;
-      int iter = 0;
+        ArrayList<Double> data = new ArrayList<Double>();
+        int count = 0;
+        int iter = 0;
 
-      long itemCount = entity.getEntityInfo().getItemCount();
+        long itemCount = entity.getEntityInfo().getItemCount();
 
-      try {
-         RandomAccessFile file = new RandomAccessFile(filePath, "r");
-         file.seek(byteOffset);
+        try {
+            RandomAccessFile file = new RandomAccessFile(filePath, "r");
+            file.seek(byteOffset);
 
-         int x = 0;
-         while (count < itemCount) {
-            ReaderUtils.readDouble(file);
-            dataCount = ReaderUtils.readUnsignedInt(file);
+            int x = 0;
+            while (count < itemCount) {
+                ReaderUtils.readDouble(file);
+                dataCount = ReaderUtils.readUnsignedInt(file);
 
-            ArrayList<Double> values = new ArrayList<Double>();
+                ArrayList<Double> values = new ArrayList<Double>();
 
-            if (iter == segmentNum) {
-               if (from > dataCount) {
-                  from = (int) (dataCount - 1);
-               }
+                if (iter == segmentNum) {
+                    if (from > dataCount) {
+                        from = (int) (dataCount - 1);
+                    }
 
-               if (to > dataCount) {
-                  to = (int) (dataCount - 1);
-               }
+                    if (to > dataCount) {
+                        to = (int) (dataCount - 1);
+                    }
 
-               file.seek(file.getFilePointer() + (ConstantValues.DOUBLE_BYTE_SIZE * from));
+                    file.seek(file.getFilePointer() + (ConstantValues.DOUBLE_BYTE_SIZE * from));
 
-//               System.out.println("from: " + from + "\tto: " + to + "\tdataCount: " + dataCount);
 
-               for (int valNDX = from; valNDX <= to; valNDX++) {
-                  data.add(ReaderUtils.readDouble(file));
-                  count++;
-               }
-               break;
-            } else {
-               //skip this data
-               file.seek(file.getFilePointer() + (ConstantValues.DOUBLE_BYTE_SIZE * dataCount));
-               count += dataCount;
+                    for (int valNDX = from; valNDX <= to; valNDX++) {
+                        data.add(ReaderUtils.readDouble(file));
+                        count++;
+                    }
+                    break;
+                } else {
+                    //skip this data
+                    file.seek(file.getFilePointer() + (ConstantValues.DOUBLE_BYTE_SIZE * dataCount));
+                    count += dataCount;
+                }
+
+                iter++;
+            }
+            file.close();
+        } catch (Exception err) {
+            err.printStackTrace();
+            return null;
+        }
+        return data;
+    }
+
+    private synchronized long getDataCount() {
+        try {
+            int count = 0;
+            int iter = 0;
+            long itemCount = entity.getEntityInfo().getItemCount();
+            RandomAccessFile file = new RandomAccessFile(filePath, "r");
+
+            file.seek(byteOffset);
+
+            while (count < itemCount) {
+                ReaderUtils.readDouble(file);
+                dataCount = ReaderUtils.readUnsignedInt(file);
+
+                if (iter == segmentNum) {
+                    break;
+                }
+                //skip this data
+                file.seek(file.getFilePointer() + (ConstantValues.DOUBLE_BYTE_SIZE * dataCount));
+                count += dataCount;
+                iter++;
             }
 
-            iter++;
-         }
-         file.close();
-      } catch (Exception err) {
-         System.out.println("crazy error: ");
-         err.printStackTrace();
-      }
-      return data;
-   }
-
-   private synchronized long getDataCount() {
-      try {
-         int count = 0;
-         int iter = 0;
-         long itemCount = entity.getEntityInfo().getItemCount();
-         RandomAccessFile file = new RandomAccessFile(filePath, "r");
-
-         file.seek(byteOffset);
-
-         while (count < itemCount) {
-            ReaderUtils.readDouble(file);
-            dataCount = ReaderUtils.readUnsignedInt(file);
-
-            if (iter == segmentNum) {
-               break;
-            }
-            //skip this data
-            file.seek(file.getFilePointer() + (ConstantValues.DOUBLE_BYTE_SIZE * dataCount));
-            count += dataCount;
-            iter++;
-         }
-
-         file.close();
-      } catch (Exception err) {
-         err.printStackTrace();
-      }
-      return dataCount;
-   }
+            file.close();
+        } catch (Exception err) {
+            err.printStackTrace();
+            return -1;
+        }
+        return dataCount;
+    }
 }

@@ -21,6 +21,7 @@ import jp.atr.dni.bmi.desktop.model.api.data.APIList;
 import jp.atr.dni.bmi.desktop.model.api.data.NSNSegmentSource;
 import jp.atr.dni.bmi.desktop.model.utils.DoubleInputVerifierForJTextField;
 import jp.atr.dni.bmi.desktop.model.utils.UnsignedIntegerInputVerifierForJTextField;
+import jp.atr.dni.bmi.desktop.neuroshareutils.SegmentSourceInfo;
 import org.openide.DialogDescriptor;
 import org.openide.DialogDisplayer;
 import org.openide.util.Lookup;
@@ -969,7 +970,7 @@ public class ChannelPropertyEditor extends javax.swing.JPanel implements ActionL
       } else if (channel.getType().equals(ChannelType.SEGMENT)) {
          // Segment Entity Header.
          SegmentChannel sChannel = (SegmentChannel) channel;
-         NSNSegmentSource ssi = sChannel.getSegmentSource(0);
+         SegmentSourceInfo ssi = sChannel.getSegmentSource(0);
 
          layout.show(jPanel1, "card4");
          segmentChannelLabel.setText(sChannel.getLabel());
@@ -1103,7 +1104,7 @@ public class ChannelPropertyEditor extends javax.swing.JPanel implements ActionL
 
          sChannel.setSamplingRate(Double.parseDouble(segmentSampleRate.getText()));
          sChannel.setUnits(segmentUnit.getText());
-         NSNSegmentSource ssi = sChannel.getSegmentSource(0);
+         SegmentSourceInfo ssi = sChannel.getSegmentSource(0);
 
          ssi.setMinVal(Double.parseDouble(segmentMinVal.getText()));
          ssi.setMaxVal(Double.parseDouble(segmentMaxVal.getText()));
