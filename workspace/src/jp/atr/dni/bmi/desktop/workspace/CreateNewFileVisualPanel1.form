@@ -26,7 +26,7 @@
               <Group type="103" groupAlignment="0" attributes="0">
                   <Group type="102" alignment="1" attributes="0">
                       <Component id="jButton1" min="-2" max="-2" attributes="0"/>
-                      <EmptySpace pref="133" max="32767" attributes="0"/>
+                      <EmptySpace pref="120" max="32767" attributes="0"/>
                   </Group>
                   <Component id="jTextField1" alignment="1" pref="208" max="32767" attributes="0"/>
                   <Component id="jComboBox1" alignment="0" pref="208" max="32767" attributes="0"/>

@@ -68,7 +68,7 @@ public final class CreateNewFileVisualPanel1 extends JPanel {
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                         .addComponent(jButton1)
-                        .addContainerGap(133, Short.MAX_VALUE))
+                        .addContainerGap(120, Short.MAX_VALUE))
                     .addComponent(jTextField1, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 208, Short.MAX_VALUE)
                     .addComponent(jComboBox1, 0, 208, Short.MAX_VALUE)))
         );
