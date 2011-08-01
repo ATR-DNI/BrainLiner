@@ -27,6 +27,7 @@ final class NSNAnalogDataProvider implements APIDataProvider {
         this.filePath = nsnEntity.getEntityInfo().getFilePath();
         this.byteOffset = nsnEntity.getEntityInfo().getDataPosition();
         this.dataCount = -1;
+        this.segmentNum = segmentNum;
     }
 
     @Override
@@ -41,7 +42,6 @@ final class NSNAnalogDataProvider implements APIDataProvider {
         ArrayList<Double> data = new ArrayList<Double>();
         int count = 0;
         int iter = 0;
-
         long itemCount = entity.getEntityInfo().getItemCount();
 
         try {
@@ -53,8 +53,6 @@ final class NSNAnalogDataProvider implements APIDataProvider {
                 ReaderUtils.readDouble(file);
                 dataCount = ReaderUtils.readUnsignedInt(file);
 
-                ArrayList<Double> values = new ArrayList<Double>();
-
                 if (iter == segmentNum) {
                     if (from > dataCount) {
                         from = (int) (dataCount - 1);
@@ -64,8 +62,8 @@ final class NSNAnalogDataProvider implements APIDataProvider {
                         to = (int) (dataCount - 1);
                     }
 
-                    file.seek(file.getFilePointer() + (ConstantValues.DOUBLE_BYTE_SIZE * from));
-
+                    // skip to the "from" index. 
+                    file.skipBytes(ConstantValues.DOUBLE_BYTE_SIZE * from);
 
                     for (int valNDX = from; valNDX <= to; valNDX++) {
                         data.add(ReaderUtils.readDouble(file));
@@ -74,7 +72,7 @@ final class NSNAnalogDataProvider implements APIDataProvider {
                     break;
                 } else {
                     //skip this data
-                    file.seek(file.getFilePointer() + (ConstantValues.DOUBLE_BYTE_SIZE * dataCount));
+                    file.skipBytes(((Long) (ConstantValues.DOUBLE_BYTE_SIZE * dataCount)).intValue());
                     count += dataCount;
                 }
 
@@ -105,7 +103,7 @@ final class NSNAnalogDataProvider implements APIDataProvider {
                     break;
                 }
                 //skip this data
-                file.seek(file.getFilePointer() + (ConstantValues.DOUBLE_BYTE_SIZE * dataCount));
+                file.skipBytes(((Long)(ConstantValues.DOUBLE_BYTE_SIZE * dataCount)).intValue());
                 count += dataCount;
                 iter++;
             }

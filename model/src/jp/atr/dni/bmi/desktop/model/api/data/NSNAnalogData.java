@@ -15,83 +15,84 @@ import jp.atr.dni.bmi.desktop.neuroshareutils.ReaderUtils;
  */
 public final class NSNAnalogData implements APIData {
 
-   private AnalogInfo nsnEntity;
-   private ArrayList<Double> timeStamps;
-   private ArrayList<APIList<Double>> values;
+    private AnalogInfo nsnEntity;
+    private ArrayList<Double> timeStamps;
+    private ArrayList<APIList<Double>> values;
 
-   /**
-    * Constructor. 
-    * 
-    * @param nsnEntity - the neuroshare entity underlying this channel's data
-    */
-   public NSNAnalogData(AnalogInfo nsnEntity) {
-      this.nsnEntity = nsnEntity;
-      initializeData();
-   }
+    /**
+     * Constructor. 
+     * 
+     * @param nsnEntity - the neuroshare entity underlying this channel's data
+     */
+    public NSNAnalogData(AnalogInfo nsnEntity) {
+        this.nsnEntity = nsnEntity;
+        initializeData();
+    }
 
-   /**
-    * This method initializes the data for the AnalogChannel. It creates a new APIList and data provider for each segment of data.
-    */
-   private void initializeData() {
-      timeStamps = new ArrayList<Double>();
-      values = new ArrayList<APIList<Double>>();
+    /**
+     * This method initializes the data for the AnalogChannel. It creates a new APIList and data provider for each segment of data.
+     */
+    private void initializeData() {
+        timeStamps = new ArrayList<Double>();
+        values = new ArrayList<APIList<Double>>();
 
-      int count = 0;
+        int count = 0;
 
-      String filePath = nsnEntity.getEntityInfo().getFilePath();
-      long byteOffset = nsnEntity.getEntityInfo().getDataPosition();
-      long itemCount = nsnEntity.getEntityInfo().getItemCount();
+        String filePath = nsnEntity.getEntityInfo().getFilePath();
+        long byteOffset = nsnEntity.getEntityInfo().getDataPosition();
+        long itemCount = nsnEntity.getEntityInfo().getItemCount();
 
-      try {
-         RandomAccessFile file = new RandomAccessFile(filePath, "r");
-         file.seek(byteOffset);
+        try {
+            RandomAccessFile file = new RandomAccessFile(filePath, "r");
+            file.seek(byteOffset);
 
-         int segmentNum = 0;
-         while (count < itemCount) {
+            int segmentNum = 0;
+            while (count < itemCount) {
 
-            double timeStamp = ReaderUtils.readDouble(file);
-            timeStamps.add(timeStamp);
+                double timeStamp = ReaderUtils.readDouble(file);
+                timeStamps.add(timeStamp);
 
-            long dataCount = ReaderUtils.readUnsignedInt(file);
-            APIList<Double> vals = new APIList<Double>(new NSNAnalogDataProvider(segmentNum, nsnEntity));
-            values.add(vals);
+                long dataCount = ReaderUtils.readUnsignedInt(file);
 
-            //Skip all the data for now. Read it in through the data provider only as-needed. 
-            file.seek(file.getFilePointer() + (ConstantValues.DOUBLE_BYTE_SIZE * dataCount));
-            count += dataCount;
-            segmentNum++;
-         }
-         file.close();
-      } catch (Exception err) {
-         err.printStackTrace();
-      }
-   }
+                APIList<Double> vals = new APIList<Double>(new NSNAnalogDataProvider(segmentNum, nsnEntity));
+                values.add(vals);
 
-   /**
-    * @return the timeStamps
-    */
-   public ArrayList<Double> getTimeStamps() {
-      return timeStamps;
-   }
+                //Skip all the data for now. Read it in through the data provider only as-needed. 
+                file.skipBytes(((Long) (ConstantValues.DOUBLE_BYTE_SIZE * dataCount)).intValue());
+                count += dataCount;
+                segmentNum++;
+            }
+            file.close();
+        } catch (Exception err) {
+            err.printStackTrace();
+        }
+    }
 
-   /**
-    * @param timeStamps the timeStamps to set
-    */
-   public void setTimeStamps(ArrayList<Double> timeStamps) {
-      this.timeStamps = timeStamps;
-   }
+    /**
+     * @return the timeStamps
+     */
+    public ArrayList<Double> getTimeStamps() {
+        return timeStamps;
+    }
 
-   /**
-    * @return the values
-    */
-   public ArrayList<APIList<Double>> getValues() {
-      return values;
-   }
+    /**
+     * @param timeStamps the timeStamps to set
+     */
+    public void setTimeStamps(ArrayList<Double> timeStamps) {
+        this.timeStamps = timeStamps;
+    }
 
-   /**
-    * @param values the values to set
-    */
-   public void setValues(ArrayList<APIList<Double>> values) {
-      this.values = values;
-   }
+    /**
+     * @return the values
+     */
+    public ArrayList<APIList<Double>> getValues() {
+        return values;
+    }
+
+    /**
+     * @param values the values to set
+     */
+    public void setValues(ArrayList<APIList<Double>> values) {
+        this.values = values;
+    }
 }
