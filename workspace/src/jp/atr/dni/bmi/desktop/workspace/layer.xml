@@ -2,6 +2,10 @@
 <!DOCTYPE filesystem PUBLIC "-//NetBeans//DTD Filesystem 1.2//EN" "http://www.netbeans.org/dtds/filesystem-1_2.dtd">
 <filesystem>
     <folder name="Actions">
+        <folder name="View">
+            <file name="org-netbeans-core-actions-HTMLViewAction.instance_hidden"/>
+            <file name="org-netbeans-core-actions-LogAction.instance_hidden"/>
+        </folder>
         <folder name="Window">
             <file name="jp-atr-dni-bmi-desktop-workspace-WorkspaceAction.instance">
                 <attr name="component" methodvalue="jp.atr.dni.bmi.desktop.workspace.WorkspaceTopComponent.findInstance"/>
@@ -12,12 +16,26 @@
         </folder>
     </folder>
     <folder name="Menu">
+        <file name="Tools_hidden"/>
+        <folder name="View">
+            <file name="org-netbeans-core-actions-HTMLViewAction.shadow_hidden"/>
+            <file name="org-netbeans-core-actions-LogAction.shadow_hidden"/>
+            <file name="org-netbeans-core-windows-actions-ToolbarsListAction.instance_hidden"/>
+        </folder>
         <folder name="Window">
+            <file name="CloneDocumentAction.shadow_hidden"/>
+            <file name="Output_hidden"/>
+            <file name="ProgressListAction.shadow_hidden"/>
+            <file name="SwitchToRecentDocumentAction.shadow_hidden"/>
             <file name="WorkspaceAction.shadow">
                 <attr name="originalFile" stringvalue="Actions/Window/jp-atr-dni-bmi-desktop-workspace-WorkspaceAction.instance"/>
             </file>
         </folder>
     </folder>
+    <folder name="Services">
+        <file name="Browsers_hidden"/>
+    </folder>
+    <file name="Toolbars_hidden"/>
     <folder name="Windows2">
         <folder name="Components">
             <file name="WorkspaceTopComponent.settings" url="WorkspaceTopComponentSettings.xml"/>
