@@ -35,7 +35,7 @@ Thumbs.db
 #####################
 *build/*
 */build/*
-#/nbproject/private/platform-private.properties
+/nbproject/private/platform-private.properties
 
 # Desktop Files #
 #####################
