@@ -5,13 +5,27 @@
 package jp.atr.dni.bmi.desktop.workspace;
 
 import java.awt.Component;
+import java.util.ArrayList;
 import javax.swing.event.ChangeListener;
+import jp.atr.dni.bmi.desktop.model.api.AnalogChannel;
+import jp.atr.dni.bmi.desktop.model.api.Channel;
+import jp.atr.dni.bmi.desktop.model.api.ChannelType;
+import jp.atr.dni.bmi.desktop.model.api.EventChannel;
+import jp.atr.dni.bmi.desktop.model.api.NeuralSpikeChannel;
+import jp.atr.dni.bmi.desktop.model.api.SegmentChannel;
+import jp.atr.dni.bmi.desktop.model.api.data.APIList;
+import jp.atr.dni.bmi.desktop.model.api.data.NSNAnalogData;
+import jp.atr.dni.bmi.desktop.model.api.data.NSNEvent;
+import jp.atr.dni.bmi.desktop.model.api.data.NSNEventData;
+import jp.atr.dni.bmi.desktop.model.api.data.NSNNeuralSpikeData;
+import jp.atr.dni.bmi.desktop.model.api.data.NSNSegmentData;
 import org.openide.WizardDescriptor;
 import org.openide.WizardValidationException;
 import org.openide.util.HelpCtx;
 
 public class CreateNewFileWizardPanel2 implements WizardDescriptor.ValidatingPanel {
 
+    private ArrayList<Channel> channels = new ArrayList<Channel>();
     /**
      * The visual component that displays this panel. If you need to access the
      * component from this class, just use getComponent().
@@ -80,11 +94,20 @@ public class CreateNewFileWizardPanel2 implements WizardDescriptor.ValidatingPan
     // WizardDescriptor.getProperty & putProperty to store information entered
     // by the user.
     public void readSettings(Object settings) {
-        
+
         // Set showed tab.
         Object index = ((WizardDescriptor) settings).getProperty("fileFormat");
-        Integer indexValue = (Integer)index;
+        Integer indexValue = (Integer) index;
         component.setShowedTabIndex(indexValue);
+
+        // Get channels.
+        channels = (ArrayList<Channel>) ((WizardDescriptor) settings).getProperty("selectedChannels");
+
+        Double a = calucurateTimestampResolution();
+        component.setCalcuratedTimestampResolution(a);
+
+        Double b = calucurateTimeSpan();
+        component.setCalcuratedTimeSpan(b);
     }
 
     public void storeSettings(Object settings) {
@@ -94,7 +117,7 @@ public class CreateNewFileWizardPanel2 implements WizardDescriptor.ValidatingPan
             ((WizardDescriptor) settings).putProperty("fileType", ((CreateNewFileVisualPanel2) getComponent()).getNeuroshareFileType());
             ((WizardDescriptor) settings).putProperty("timeStampResolution", Double.valueOf(((CreateNewFileVisualPanel2) getComponent()).getNeuroshareTimeStampResolution()));
             ((WizardDescriptor) settings).putProperty("timeSpan", Double.valueOf(((CreateNewFileVisualPanel2) getComponent()).getNeuroshareTimeSpan()));
-            ((WizardDescriptor) settings).putProperty("applicationName", ((CreateNewFileVisualPanel2) getComponent()).getNeuroshareApplicationName());
+            ((WizardDescriptor) settings).putProperty("applicationName", "ATR BrainLiner v0.9");
             ((WizardDescriptor) settings).putProperty("year", Integer.valueOf(((CreateNewFileVisualPanel2) getComponent()).getNeuroshareYear()));
             ((WizardDescriptor) settings).putProperty("month", Integer.valueOf(((CreateNewFileVisualPanel2) getComponent()).getNeuroshareMonth()));
             ((WizardDescriptor) settings).putProperty("day", Integer.valueOf(((CreateNewFileVisualPanel2) getComponent()).getNeuroshareDay()));
@@ -110,7 +133,7 @@ public class CreateNewFileWizardPanel2 implements WizardDescriptor.ValidatingPan
 
     @Override
     public void validate() throws WizardValidationException {
-               String buffer = "";
+        String buffer = "";
 
         try {
             buffer = component.getNeuroshareTimeStampResolution();
@@ -175,5 +198,123 @@ public class CreateNewFileWizardPanel2 implements WizardDescriptor.ValidatingPan
             throw new WizardValidationException(null, "Invalid MilliSec value", null);
         }
 
+    }
+
+    private Double calucurateTimestampResolution() {
+        double timestampResolution = Double.MAX_VALUE;
+        double tempValue = 0;
+        boolean analogOrSegmentEntityExistFlag = false;
+        int size = this.channels.size();
+
+        // Search minimum timestamp resolution from all channels.
+        for (int i = 0; i < size; i++) {
+            Channel ch = this.channels.get(i);
+
+            // Only ANALOG & SEGMENT have timestamp resolution( 1/samplingRate ).
+            if (ch.getType() == ChannelType.ANALOG) {
+                analogOrSegmentEntityExistFlag = true;
+                AnalogChannel ac = (AnalogChannel) ch;
+
+                tempValue = 1 / ac.getSamplingRate();
+
+                if (tempValue < timestampResolution) {
+                    timestampResolution = tempValue;
+                }
+            } else if (ch.getType() == ChannelType.SEGMENT) {
+                analogOrSegmentEntityExistFlag = true;
+                SegmentChannel sc = (SegmentChannel) ch;
+
+                tempValue = 1 / sc.getSamplingRate();
+
+                if (tempValue < timestampResolution) {
+                    timestampResolution = tempValue;
+                }
+            }
+        }
+
+        if (!analogOrSegmentEntityExistFlag) {
+            // Case : Analog or SegmentEntity doesn't exist.
+            timestampResolution = 0;
+        }
+
+        return timestampResolution;
+    }
+
+    private Double calucurateTimeSpan() {
+
+        // Calcurate TimeSpan which means elapsed time.
+        double timeSpan = 0;
+        double tempValue = 0;
+        int size = this.channels.size();
+
+        // Search longest timespan from all channels.
+        for (int i = 0; i < size; i++) {
+            Channel ch = this.channels.get(i);
+
+            if (ch.getType() == ChannelType.ANALOG) {
+
+                // Analog Channel
+                AnalogChannel ac = (AnalogChannel) ch;
+                NSNAnalogData ad = ac.getData();
+                ArrayList<Double> timeStamps = ad.getTimeStamps();
+                int rowSize = timeStamps.size();
+                Double lastRowStartTime = timeStamps.get(rowSize - 1);
+                int dataCountInLastRow = ad.getValues().get(rowSize - 1).size();
+
+                // timespan is lastRowStartTime + samplingRate * (dataCountInLastRow -1);
+                tempValue = lastRowStartTime + ac.getSamplingRate() * (dataCountInLastRow - 1);
+
+                if (tempValue > timeSpan) {
+                    timeSpan = tempValue;
+                }
+            } else if (ch.getType() == ChannelType.SEGMENT) {
+
+                // Segment Channel
+                SegmentChannel sc = (SegmentChannel) ch;
+                NSNSegmentData sd = sc.getData();
+                ArrayList<Double> timeStamps = sd.getTimeStamps();
+                int rowSize = timeStamps.size();
+                Double lastRowStartTime = timeStamps.get(rowSize - 1);
+                int dataCountInLastRow = sd.getValues().get(rowSize - 1).size();
+
+                // timespan is lastRowStartTime + samplingRate * (dataCountInLastRow -1);
+                tempValue = lastRowStartTime + sc.getSamplingRate() * (dataCountInLastRow - 1);
+
+                if (tempValue > timeSpan) {
+                    timeSpan = tempValue;
+                }
+            } else if (ch.getType() == ChannelType.EVENT) {
+
+                // Event Channel
+                EventChannel ec = (EventChannel) ch;
+                NSNEventData ed = ec.getData();
+                APIList<NSNEvent> events = ed.getEvents();
+                NSNEvent lastEvent = events.get(events.size() - 1);
+
+                // timespan is lastTimestamp
+                tempValue = lastEvent.getTimestamp();
+
+                if (tempValue > timeSpan) {
+                    timeSpan = tempValue;
+                }
+            } else if (ch.getType() == ChannelType.NEURAL_SPIKE) {
+
+                // NeuralEvent Channel
+                NeuralSpikeChannel nc = (NeuralSpikeChannel) ch;
+                NSNNeuralSpikeData nd = nc.getData();
+                APIList<Double> timeStamps = nd.getTimeStamps();
+                Double lastValue = timeStamps.get(timeStamps.size() - 1);
+
+                // timespan is lastTimestamp
+                tempValue = lastValue;
+
+                if (tempValue > timeSpan) {
+                    timeSpan = tempValue;
+                }
+            }
+
+        }
+
+        return timeSpan;
     }
 }

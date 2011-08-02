@@ -78,8 +78,8 @@ public final class CreateNewFileWizardAction implements ActionListener {
       if (panels == null) {
          panels = new WizardDescriptor.Panel[]{
             new CreateNewFileWizardPanel1(),
-            new CreateNewFileWizardPanel2(),
-            new CreateNewFileWizardPanel3()
+            new CreateNewFileWizardPanel3(),
+            new CreateNewFileWizardPanel2()
          };
          String[] steps = new String[panels.length];
          for (int i = 0; i < panels.length; i++) {
