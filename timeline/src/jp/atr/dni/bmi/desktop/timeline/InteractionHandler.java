@@ -294,8 +294,7 @@ public class InteractionHandler implements KeyListener, MouseListener,
     * receive mouse wheel events.
     */
    public void mouseWheelMoved(MouseWheelEvent me) {
-      Point2D point = me.getPoint();//canvas.getVirtualCoordinates(me.getX(), me.getY());
-      System.out.println("x: " +me.getX()+"\ty: "+me.getY() );
+      Point2D point = me.getPoint();
       if (me.getWheelRotation() < 0) {
          canvas.setScale(canvas.getScale() * SCALE_AMOUNT, point);
       } else if (me.getWheelRotation() > 0) {
