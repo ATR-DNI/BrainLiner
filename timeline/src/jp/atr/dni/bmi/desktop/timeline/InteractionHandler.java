@@ -134,6 +134,7 @@ public class InteractionHandler implements KeyListener, MouseListener,
     * new interaction.
     */
    public void keyPressed(KeyEvent arg0) {
+
       int ke = arg0.getKeyCode();
 
       if (ke == KeyEvent.VK_LEFT) {
@@ -168,10 +169,10 @@ public class InteractionHandler implements KeyListener, MouseListener,
             canvas.setTranslationY(canvas.getTranslationY() - TRANSLATE_AMOUNT / canvas.getScale());
          }
       } else if (ke
-              == KeyEvent.VK_PAGE_UP) {
+              == KeyEvent.VK_Z && !arg0.isShiftDown()) {
          canvas.setScale(canvas.getScale() * SCALE_AMOUNT);
       } else if (ke
-              == KeyEvent.VK_PAGE_DOWN) {
+              == KeyEvent.VK_Z && arg0.isShiftDown()) {
          canvas.setScale(canvas.getScale() / SCALE_AMOUNT);
       } else if (ke
               == KeyEvent.VK_V) {
@@ -292,11 +293,13 @@ public class InteractionHandler implements KeyListener, MouseListener,
     * The mouse wheel controls the current zoom factor. Iteractors do not
     * receive mouse wheel events.
     */
-   public void mouseWheelMoved(MouseWheelEvent arg0) {
-      if (arg0.getWheelRotation() < 0) {
-         canvas.setScale(canvas.getScale() * SCALE_AMOUNT);
-      } else if (arg0.getWheelRotation() > 0) {
-         canvas.setScale(canvas.getScale() / SCALE_AMOUNT);
+   public void mouseWheelMoved(MouseWheelEvent me) {
+      Point2D point = me.getPoint();//canvas.getVirtualCoordinates(me.getX(), me.getY());
+      System.out.println("x: " +me.getX()+"\ty: "+me.getY() );
+      if (me.getWheelRotation() < 0) {
+         canvas.setScale(canvas.getScale() * SCALE_AMOUNT, point);
+      } else if (me.getWheelRotation() > 0) {
+         canvas.setScale(canvas.getScale() / SCALE_AMOUNT, point);
       }
    }
 

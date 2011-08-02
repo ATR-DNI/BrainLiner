@@ -4,6 +4,7 @@ import com.jogamp.opengl.util.Animator;
 import com.jogamp.opengl.util.gl2.GLUT;
 import java.awt.Dimension;
 import java.awt.geom.AffineTransform;
+import java.awt.geom.NoninvertibleTransformException;
 import java.awt.geom.Point2D;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
@@ -28,6 +29,7 @@ import jp.atr.dni.bmi.desktop.model.api.ChannelType;
 import jp.atr.dni.bmi.desktop.model.api.Workspace;
 import jp.atr.dni.bmi.desktop.model.api.data.NSNAnalogData;
 import jp.atr.dni.bmi.desktop.timeline.model.ViewerChannel;
+import org.openide.util.Exceptions;
 import org.openide.util.NbBundle;
 import org.openide.windows.TopComponent;
 import org.openide.windows.WindowManager;
@@ -538,6 +540,37 @@ public final class TimelineTopComponent extends TopComponent implements GLEventL
       maxPoint = getVirtualCoordinates(getWidth(), getHeight());
    }
 
+   private void buildTransforms(Point2D point) {
+
+      double width = getWidth();
+      double height = getHeight();
+      
+      Point2D p2 = inverseTransform.transform(point, null);
+
+      transform = new AffineTransform(1, 0, 0, 1, 0, 0);
+//      transform.translate(0.5 * width, 0.5 * height);
+      transform.translate(translationX, translationY);
+//      System.out.println("tx: " + translationX + "\tty: " + translationY);
+
+//      Translate by (x,y,0) to put the origin at those coordinates
+//Scale by your desired vector (i,j,k)
+//Translate by (-x,-y,0) to put the origin back at the top left
+
+      transform.setToIdentity();
+      transform.translate(point.getX(), point.getY());
+      transform.scale(scale, scale);
+      transform.translate(-p2.getX(), -p2.getY());
+
+      try {
+         inverseTransform = transform.createInverse();
+      } catch (Exception e) {
+      }
+
+      //Calc the bounding points for the data-space from the screen coordinates
+      minPoint = getVirtualCoordinates(0, 0);
+      maxPoint = getVirtualCoordinates(getWidth(), getHeight());
+   }
+
    /**
     * Order to draw:
     * 1) grid
@@ -616,7 +649,7 @@ public final class TimelineTopComponent extends TopComponent implements GLEventL
 
 //            System.out.println("label: " + vc.getLabel() + "\tsize: " + vals.size());
 
-            double prevX = minPoint.getX() > 2 ? (int)((minPoint.getX() - 1)/timeIncrement) : 0;
+            double prevX = minPoint.getX() > 2 ? (int) ((minPoint.getX() - 1) / timeIncrement) : 0;
 //            double prevX = 0;
 //            prevX /= timeIncrement;
             prevX = prevX % 2 == 0 ? prevX : prevX - 1;
@@ -949,7 +982,7 @@ public final class TimelineTopComponent extends TopComponent implements GLEventL
    }
 
    /**
-    * Gets the tranlation in the x direction.
+    * Gets the translation in the x direction.
     */
    public double getTranslationX() {
       return translationX;
@@ -964,7 +997,7 @@ public final class TimelineTopComponent extends TopComponent implements GLEventL
    }
 
    /**
-    * Gets the tranlation in the y direction.
+    * Gets the translation in the y direction.
     */
    public double getTranslationY() {
       return translationY;
@@ -983,6 +1016,18 @@ public final class TimelineTopComponent extends TopComponent implements GLEventL
     */
    public double getScale() {
       return scale;
+   }
+
+   /**
+    * Sets the scale and rebuilds the affine transforms.
+    */
+   public void setScale(double scale, Point2D point) {
+//		if (scale < 0.008 || scale > .2) {
+//			return;
+//		}
+
+      this.scale = scale;
+      buildTransforms(point);
    }
 
    /**
