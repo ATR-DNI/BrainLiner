@@ -67,7 +67,7 @@ class NSNEventDataProvider implements APIDataProvider<NSNEvent> {
 
                 dataCount = ReaderUtils.readUnsignedInt(file);
 
-                if (entity.getEventType() == EventType.EVENT_TEXT.ordinal()) {
+                if (entity.getEventType() == EventType.EVENT_TEXT) {
                     // We are dealing with text
                     String dataStr = "";
 
@@ -78,10 +78,10 @@ class NSNEventDataProvider implements APIDataProvider<NSNEvent> {
                     // Set Value
                     record.setValue(dataStr);
 
-                } else if (entity.getEventType() == 1) {
+                } else if (entity.getEventType() == EventType.EVENT_CSV) {
                     // We are dealing with CSV. What do we do here?! TODO:XXX:FIXME:
                     // XXX: this is not defined in the FILE format specification
-                } else if (entity.getEventType() == EventType.EVENT_BYTE.ordinal()) {
+                } else if (entity.getEventType() == EventType.EVENT_BYTE) {
                     // We are dealing with 1-byte values
                     // NOTE: We use the wordevent data for 1 and 2 byte values, because both are stored as
                     // ints.
@@ -90,13 +90,13 @@ class NSNEventDataProvider implements APIDataProvider<NSNEvent> {
                     // Set Value
                     record.setValue(binData);
 
-                } else if (entity.getEventType() == EventType.EVENT_WORD.ordinal()) {
+                } else if (entity.getEventType() == EventType.EVENT_WORD) {
                     // We are dealing with 2-byte values
                     int binData = file.readUnsignedShort();
 
                     // Set Value
                     record.setValue(binData);
-                } else if (entity.getEventType() == EventType.EVENT_DWORD.ordinal()) {
+                } else if (entity.getEventType() == EventType.EVENT_DWORD) {
                     // We are dealing with 4-byte values
                     long binData = ReaderUtils.readUnsignedInt(file);
 

@@ -2,7 +2,7 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package jp.atr.dni.bmi.desktop.neuroshareutils;
+package jp.atr.dni.bmi.desktop.neuroshareutils.readers;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -17,6 +17,26 @@ import java.util.Date;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.annotation.processing.FilerException;
+import jp.atr.dni.bmi.desktop.neuroshareutils.AnalogData;
+import jp.atr.dni.bmi.desktop.neuroshareutils.AnalogInfo;
+import jp.atr.dni.bmi.desktop.neuroshareutils.ByteEventData;
+import jp.atr.dni.bmi.desktop.neuroshareutils.ConstantValues;
+import jp.atr.dni.bmi.desktop.neuroshareutils.DWordEventData;
+import jp.atr.dni.bmi.desktop.neuroshareutils.Entity;
+import jp.atr.dni.bmi.desktop.neuroshareutils.EntityInfo;
+import jp.atr.dni.bmi.desktop.neuroshareutils.EntityType;
+import jp.atr.dni.bmi.desktop.neuroshareutils.EventData;
+import jp.atr.dni.bmi.desktop.neuroshareutils.EventInfo;
+import jp.atr.dni.bmi.desktop.neuroshareutils.EventType;
+import jp.atr.dni.bmi.desktop.neuroshareutils.FileInfo;
+import jp.atr.dni.bmi.desktop.neuroshareutils.NeuralInfo;
+import jp.atr.dni.bmi.desktop.neuroshareutils.NeuroshareFile;
+import jp.atr.dni.bmi.desktop.neuroshareutils.SegmentData;
+import jp.atr.dni.bmi.desktop.neuroshareutils.SegmentInfo;
+import jp.atr.dni.bmi.desktop.neuroshareutils.SegmentSourceInfo;
+import jp.atr.dni.bmi.desktop.neuroshareutils.Tag;
+import jp.atr.dni.bmi.desktop.neuroshareutils.TextEventData;
+import jp.atr.dni.bmi.desktop.neuroshareutils.WordEventData;
 import org.apache.poi.hssf.usermodel.HSSFCell;
 import org.apache.poi.hssf.usermodel.HSSFCellStyle;
 import org.apache.poi.hssf.usermodel.HSSFDataFormat;
@@ -113,7 +133,12 @@ public class CSVReader {
                 // Get Channel Name information.{2,*}
                 rowData = sheet.getRow(2);
                 cellData = rowData.getCell(channel);
-                String channelName = cellData.getStringCellValue();
+
+                // Default Channel Name : chx (x = 1,2...)
+                String channelName = "ch" + (channel + 1);
+                if (cellData != null) {
+                    channelName = cellData.getStringCellValue();
+                }
                 // Get NEXT Channel Name information to distinguish entity type.
                 // [Event | Segment] or[Analong | NeuralEvent]
                 String nextChannelName = null;
@@ -131,7 +156,12 @@ public class CSVReader {
                 rowData = sheet.getRow(3);
                 cellData = rowData.getCell(channel);
                 // desc will be used to register unit and location.
-                String desc = cellData.getStringCellValue();
+
+                // Default desc : ""
+                String desc = "";
+                if (cellData != null) {
+                    desc = cellData.getStringCellValue();
+                }
 
                 // Get Sampling Rate information.{4,*}
                 rowData = sheet.getRow(4);
@@ -159,13 +189,13 @@ public class CSVReader {
                         double calcTimeStamp = 0;
 
                         // Tag
-                        // 340 : ns_ENTITYINFO + ns_SEGMENTINFO + ns_SEGSOURCEINFO
-                        Tag tag = new Tag(EntityType.ENTITY_SEGMENT, ConstantValues.NS_ENTITYINFO_LENGTH + ConstantValues.NS_SEGMENTINFO_LENGTH + ConstantValues.NS_SEGSOURCEINFO_LENGTH);
+                        // 92 : ns_ENTITYINFO + ns_SEGMENTINFO
+                        Tag tag = new Tag(EntityType.ENTITY_SEGMENT, ConstantValues.NS_ENTITYINFO_LENGTH + ConstantValues.NS_SEGMENTINFO_LENGTH);
 
                         // EntityInfo
                         // 3 : SEGMENTENTITY, 0 : ItemCount
                         EntityInfo entityInfo = new EntityInfo(channelName,
-                                EntityType.ENTITY_SEGMENT.ordinal(), 0);
+                                EntityType.ENTITY_SEGMENT, 0);
                         entityInfo.setFilePath(csvFilePath);
 
                         SegmentInfo segmentEntity = new SegmentInfo(tag, entityInfo);
@@ -187,6 +217,16 @@ public class CSVReader {
                         long unitIDValue = 0;
                         int unitIDValueType = 0;
                         int valueType = 0;
+
+                        // Get unit and location from desc.
+                        String unit = getUnit(desc);
+                        double locationX = getLocationX(desc);
+                        double locationY = getLocationY(desc);
+                        double locationZ = getLocationZ(desc);
+                        double locationUser = getLocationUser(desc);
+
+                        segmentEntity.setUnits(unit);
+
 
                         // Load Data.
                         for (int ff = 5; ff <= maxRow; ff++) {
@@ -213,6 +253,13 @@ public class CSVReader {
                                 priviousUnitIDValue = unitIDValue;
                                 long sc = 0;
 
+                                // Add SegmentSourceInfo
+                                minVal = Double.MAX_VALUE;
+                                maxVal = Double.MIN_VALUE;
+                                ssi.add(new SegmentSourceInfo(minVal, maxVal, 0, 0, locationX, locationY, locationZ, locationUser, 0, 0, "", 0, 0, "", desc));
+                                segmentEntity.setSegSourceInfos(ssi);
+                                segmentEntity.setSourceCount(segmentEntity.getSourceCount() + 1);
+
                                 // Add timeStamp, unitID, sampleCount
                                 timeStamp.add(calcTimeStamp);
                                 unitIDValues.add(unitIDValue);
@@ -220,8 +267,8 @@ public class CSVReader {
                                 segmentRowData.add(segmentValues);
 
                                 // Count up.
-                                // 8 : TimeStamp, 4 : unitID, 4 : sampleCount.
-                                tag.setElemLength(tag.getElemLength() + 8 + 4 + 4);
+                                // 248 : SegSourceInfo, 8 : TimeStamp, 4 : unitID, 4 : sampleCount.
+                                tag.setElemLength(tag.getElemLength() + ConstantValues.NS_SEGSOURCEINFO_LENGTH + 8 + 4 + 4);
                             }
 
 
@@ -230,9 +277,16 @@ public class CSVReader {
                                 priviousUnitIDValue = unitIDValue;
                                 long sc = 0;
 
+                                // Add SegmentSourceInfo
+                                minVal = Double.MAX_VALUE;
+                                maxVal = Double.MIN_VALUE;
+                                ssi.add(new SegmentSourceInfo(minVal, maxVal, 0, 0, locationX, locationY, locationZ, locationUser, 0, 0, "", 0, 0, "", desc));
+                                segmentEntity.setSegSourceInfos(ssi);
+                                segmentEntity.setSourceCount(segmentEntity.getSourceCount() + 1);
+
                                 // Count up.
-                                // 8 : TimeStamp, 4 : unitID, 4 : sampleCount.
-                                tag.setElemLength(tag.getElemLength() + 8 + 4 + 4);
+                                // 248 : SegSourceInfo, 8 : TimeStamp, 4 : unitID, 4 : sampleCount.
+                                tag.setElemLength(tag.getElemLength() + ConstantValues.NS_SEGSOURCEINFO_LENGTH + 8 + 4 + 4);
 
                                 // remove SegmentValues
 //                                int len = segmentValues.size();
@@ -279,9 +333,19 @@ public class CSVReader {
                             if (data != null) {
                                 if (data < minVal) {
                                     minVal = data;
+                                    ArrayList<SegmentSourceInfo> segSourceInfos = segmentEntity.getSegSourceInfos();
+                                    SegmentSourceInfo temp = segSourceInfos.get(segSourceInfos.size() - 1);
+                                    temp.setMinVal(minVal);
+                                    segSourceInfos.set(segSourceInfos.size() - 1, temp);
+                                    segmentEntity.setSegSourceInfos(segSourceInfos);
                                 }
                                 if (data > maxVal) {
                                     maxVal = data;
+                                    ArrayList<SegmentSourceInfo> segSourceInfos = segmentEntity.getSegSourceInfos();
+                                    SegmentSourceInfo temp = segSourceInfos.get(segSourceInfos.size() - 1);
+                                    temp.setMaxVal(maxVal);
+                                    segSourceInfos.set(segSourceInfos.size() - 1, temp);
+                                    segmentEntity.setSegSourceInfos(segSourceInfos);
                                 }
                             }
                         }
@@ -294,17 +358,6 @@ public class CSVReader {
                         // SegmentData
                         segmentEntity.setSegData(sd);
 
-                        // Get unit and location from desc.
-                        String unit = getUnit(desc);
-                        double locationX = getLocationX(desc);
-                        double locationY = getLocationY(desc);
-                        double locationZ = getLocationZ(desc);
-                        double locationUser = getLocationUser(desc);
-
-                        // ns_SEGSOURCEINFO
-                        ssi.add(new SegmentSourceInfo(minVal, maxVal, 0, 0, locationX, locationY, locationZ, locationUser, 0, 0, "", 0, 0, "", desc));
-                        segmentEntity.setSegSourceInfos(ssi);
-                        segmentEntity.setUnits(unit);
 
                         // ns_ENTITYINFO
                         segmentEntity.setEntityInfo(entityInfo);
@@ -334,7 +387,7 @@ public class CSVReader {
                         // EntityInfo
                         // 2 : ANALOGENTITY, 0 : ItemCount
                         EntityInfo entityInfo = new EntityInfo(channelName,
-                                EntityType.ENTITY_ANALOG.ordinal(), 0);
+                                EntityType.ENTITY_ANALOG, 0);
                         entityInfo.setFilePath(csvFilePath);
 
                         AnalogInfo analogEntity = new AnalogInfo(tag, entityInfo);
@@ -453,7 +506,7 @@ public class CSVReader {
                     // EntityInfo
                     // 1 : EVENTENTITY, 0 : ItemCount
                     EntityInfo entityInfo = new EntityInfo(channelName,
-                            EntityType.ENTITY_EVENT.ordinal(), 0);
+                            EntityType.ENTITY_EVENT, 0);
                     entityInfo.setFilePath(csvFilePath);
 
                     EventInfo eventEntity = new EventInfo(tag, entityInfo);
@@ -473,6 +526,7 @@ public class CSVReader {
                     rowData = sheet.getRow(5);
                     cellData = rowData.getCell(nextChannel);
                     int dataType = cellData.getCellType();
+                    EventType et = EventType.EVENT_BYTE;
 
                     // Load Data.
                     for (int ff = 5; ff <= maxRow; ff++) {
@@ -497,6 +551,7 @@ public class CSVReader {
                                     sizeOfValue);
                             dWordEventData.setData(longValue);
                             eventData.add(dWordEventData);
+                            et = EventType.EVENT_DWORD;
 
                         } else if (dataType == Cell.CELL_TYPE_STRING) {
                             // Add textEventData.
@@ -512,6 +567,7 @@ public class CSVReader {
                                     channel).getNumericCellValue(), sizeOfValue);
                             textEventData.setData(textValue);
                             eventData.add(textEventData);
+                            et = EventType.EVENT_TEXT;
 
                         } else {
                             continue;
@@ -539,7 +595,7 @@ public class CSVReader {
                     eventEntity.setData(eventData);
 
                     // ns_EVENTINFO
-                    eventEntity.setEventType(dataType);
+                    eventEntity.setEventType(et);
                     eventEntity.setMinDataLength(minDataLength);
                     eventEntity.setMaxDataLength(maxDataLength);
                     eventEntity.setCsvDesc(channelName);
@@ -572,7 +628,7 @@ public class CSVReader {
                     // EntityInfo
                     // 4 : NEURALEVENTENTITY, 0 : ItemCount
                     EntityInfo entityInfo = new EntityInfo(channelName,
-                            EntityType.ENTITY_NEURAL.ordinal(), 0);
+                            EntityType.ENTITY_NEURAL, 0);
                     entityInfo.setFilePath(csvFilePath);
 
                     NeuralInfo neuralEntity = new NeuralInfo(tag, entityInfo);
@@ -793,7 +849,7 @@ public class CSVReader {
                         // EntityInfo
                         // 3 : SEGMENTENTITY, 0 : ItemCount
                         EntityInfo entityInfo = new EntityInfo(channelName,
-                                EntityType.ENTITY_SEGMENT.ordinal(), 0);
+                                EntityType.ENTITY_SEGMENT, 0);
                         entityInfo.setFilePath(csvFilePath);
 
                         SegmentInfo segmentEntity = new SegmentInfo(tag, entityInfo);
@@ -962,7 +1018,7 @@ public class CSVReader {
                         // EntityInfo
                         // 2 : ANALOGENTITY, 0 : ItemCount
                         EntityInfo entityInfo = new EntityInfo(channelName,
-                                EntityType.ENTITY_ANALOG.ordinal(), 0);
+                                EntityType.ENTITY_ANALOG, 0);
                         entityInfo.setFilePath(csvFilePath);
 
                         AnalogInfo analogEntity = new AnalogInfo(tag, entityInfo);
@@ -1081,7 +1137,7 @@ public class CSVReader {
                     // EntityInfo
                     // 1 : EVENTENTITY, 0 : ItemCount
                     EntityInfo entityInfo = new EntityInfo(channelName,
-                            EntityType.ENTITY_EVENT.ordinal(), 0);
+                            EntityType.ENTITY_EVENT, 0);
                     entityInfo.setFilePath(csvFilePath);
 
                     EventInfo eventEntity = new EventInfo(tag, entityInfo);
@@ -1101,6 +1157,7 @@ public class CSVReader {
                     rowData = sheet.getRow(5);
                     cellData = rowData.getCell(nextChannel);
                     int dataType = cellData.getCellType();
+                    EventType et = EventType.EVENT_BYTE;
 
                     // Load Data.
                     for (int ff = 5; ff <= maxRow; ff++) {
@@ -1125,6 +1182,7 @@ public class CSVReader {
                                     sizeOfValue);
                             dWordEventData.setData(longValue);
                             eventData.add(dWordEventData);
+                            et = EventType.EVENT_DWORD;
 
                         } else if (dataType == Cell.CELL_TYPE_STRING) {
                             // Add textEventData.
@@ -1140,6 +1198,7 @@ public class CSVReader {
                                     channel).getNumericCellValue(), sizeOfValue);
                             textEventData.setData(textValue);
                             eventData.add(textEventData);
+                            et = EventType.EVENT_TEXT;
 
                         } else {
                             continue;
@@ -1167,7 +1226,7 @@ public class CSVReader {
                     //eventEntity.setData(eventData);
 
                     // ns_EVENTINFO
-                    eventEntity.setEventType(dataType);
+                    eventEntity.setEventType(et);
                     eventEntity.setMinDataLength(minDataLength);
                     eventEntity.setMaxDataLength(maxDataLength);
                     eventEntity.setCsvDesc(channelName);
@@ -1200,7 +1259,7 @@ public class CSVReader {
                     // EntityInfo
                     // 4 : NEURALEVENTENTITY, 0 : ItemCount
                     EntityInfo entityInfo = new EntityInfo(channelName,
-                            EntityType.ENTITY_NEURAL.ordinal(), 0);
+                            EntityType.ENTITY_NEURAL, 0);
                     entityInfo.setFilePath(csvFilePath);
 
                     NeuralInfo neuralEntity = new NeuralInfo(tag, entityInfo);
@@ -1293,8 +1352,9 @@ public class CSVReader {
     /**
      *
      * @param fileFullPath
-     * @param entityNFO
-     * @param segNFO
+     * @param dataPosition
+     * @param entityType
+     * @param label
      * @return
      * @throws IOException
      */
@@ -1312,7 +1372,7 @@ public class CSVReader {
             // DataPosition
             // EntityType
             // EntityLabel
-            if (e.getEntityInfo().getDataPosition() == dataPosition && e.getEntityInfo().getEntityType() == entityType) {
+            if (e.getEntityInfo().getDataPosition() == dataPosition && e.getEntityInfo().getEntityType() == EntityType.getEntityType(entityType)) {
                 SegmentInfo si = (SegmentInfo) e;
                 if (si.getEntityInfo().getEntityLabel().equals(label)) {
                     return si.getSegData();
@@ -1326,7 +1386,9 @@ public class CSVReader {
     /**
      *
      * @param fileFullPath
-     * @param entityNFO
+     * @param dataPosition
+     * @param entityType
+     * @param label
      * @return
      * @throws IOException
      */
@@ -1343,7 +1405,7 @@ public class CSVReader {
             // DataPosition
             // EntityType
             // EntityLabel
-            if (e.getEntityInfo().getDataPosition() == dataPosition && e.getEntityInfo().getEntityType() == entityType && e.getEntityInfo().getEntityLabel().equals(label)) {
+            if (e.getEntityInfo().getDataPosition() == dataPosition && e.getEntityInfo().getEntityType() == EntityType.getEntityType(entityType) && e.getEntityInfo().getEntityLabel().equals(label)) {
                 NeuralInfo ni = (NeuralInfo) e;
                 if (ni.getEntityInfo().getEntityLabel().equals(label)) {
                     return ni.getData();
@@ -1357,7 +1419,9 @@ public class CSVReader {
     /**
      *
      * @param fileFullPath
-     * @param entityNFO
+     * @param dataPosition
+     * @param entityType
+     * @param label
      * @return
      * @throws IOException
      */
@@ -1374,7 +1438,7 @@ public class CSVReader {
             // DataPosition
             // EntityType
             // EntityLabel
-            if (e.getEntityInfo().getDataPosition() == dataPosition && e.getEntityInfo().getEntityType() == entityType && e.getEntityInfo().getEntityLabel().equals(label)) {
+            if (e.getEntityInfo().getDataPosition() == dataPosition && e.getEntityInfo().getEntityType() == EntityType.getEntityType(entityType) && e.getEntityInfo().getEntityLabel().equals(label)) {
                 AnalogInfo ai = (AnalogInfo) e;
                 if (ai.getEntityInfo().getEntityLabel().equals(label)) {
                     return ai.getData();
@@ -1388,12 +1452,14 @@ public class CSVReader {
     /**
      *
      * @param fileFullPath
-     * @param entityNFO
-     * @param eventNFO
+     * @param dataPosition
+     * @param entityType
+     * @param eventType
+     * @param label
      * @return
      * @throws IOException
      */
-    public ArrayList<ByteEventData> getByteEventData(String fileFullPath, long dataPosition, long eventType, long entityType, String label) throws IOException {
+    public ArrayList<ByteEventData> getByteEventData(String fileFullPath, long dataPosition, long entityType, long eventType, String label) throws IOException {
 
         // Read all csv data to get neural Data. (to Get Neuroshare Format.)
         NeuroshareFile csvFileAllData = readCsvFileAllData(fileFullPath);
@@ -1406,9 +1472,10 @@ public class CSVReader {
             // DataPosition
             // EntityType
             // EntityLabel
-            if (e.getEntityInfo().getDataPosition() == dataPosition && e.getEntityInfo().getEntityType() == entityType && e.getEntityInfo().getEntityLabel().equals(label)) {
+            if (e.getEntityInfo().getDataPosition() == dataPosition && e.getEntityInfo().getEntityType() == EntityType.getEntityType(eventType)
+                    && e.getEntityInfo().getEntityLabel().equals(label)) {
                 EventInfo ei = (EventInfo) e;
-                if (ei.getEntityInfo().getEntityLabel().equals(label) && ei.getEventType() == eventType) {
+                if (ei.getEntityInfo().getEntityLabel().equals(label) && ei.getEventType() == EventType.getEventType(eventType)) {
                     ArrayList<EventData> data = ei.getData();
                     ArrayList<ByteEventData> bed = new ArrayList<ByteEventData>();
                     for (int jj = 0; jj < data.size(); jj++) {
@@ -1426,8 +1493,10 @@ public class CSVReader {
     /**
      *
      * @param fileFullPath
-     * @param entityNFO
-     * @param eventNFO
+     * @param dataPosition
+     * @param entityType
+     * @param eventType
+     * @param label
      * @return
      * @throws IOException
      */
@@ -1444,9 +1513,9 @@ public class CSVReader {
             // DataPosition
             // EntityType
             // EntityLabel
-            if (e.getEntityInfo().getDataPosition() == dataPosition && e.getEntityInfo().getEntityType() == entityType && e.getEntityInfo().getEntityLabel().equals(label)) {
+            if (e.getEntityInfo().getDataPosition() == dataPosition && e.getEntityInfo().getEntityType() == EntityType.getEntityType(entityType) && e.getEntityInfo().getEntityLabel().equals(label)) {
                 EventInfo ei = (EventInfo) e;
-                if (ei.getEntityInfo().getEntityLabel().equals(label) && ei.getEventType() == eventType) {
+                if (ei.getEntityInfo().getEntityLabel().equals(label) && ei.getEventType() == EventType.getEventType(eventType)) {
                     ArrayList<EventData> data = ei.getData();
                     ArrayList<DWordEventData> dwed = new ArrayList<DWordEventData>();
                     for (int jj = 0; jj < data.size(); jj++) {
@@ -1464,8 +1533,10 @@ public class CSVReader {
     /**
      *
      * @param fileFullPath
-     * @param entityNFO
-     * @param eventNFO
+     * @param dataPosition
+     * @param entityType
+     * @param eventType
+     * @param label
      * @return
      * @throws IOException
      */
@@ -1482,9 +1553,9 @@ public class CSVReader {
             // DataPosition
             // EntityType
             // EntityLabel
-            if (e.getEntityInfo().getDataPosition() == dataPosition && e.getEntityInfo().getEntityType() == entityType && e.getEntityInfo().getEntityLabel().equals(label)) {
+            if (e.getEntityInfo().getDataPosition() == dataPosition && e.getEntityInfo().getEntityType() == EntityType.getEntityType(entityType) && e.getEntityInfo().getEntityLabel().equals(label)) {
                 EventInfo ei = (EventInfo) e;
-                if (ei.getEntityInfo().getEntityLabel().equals(label) && ei.getEventType() == eventType) {
+                if (ei.getEntityInfo().getEntityLabel().equals(label) && ei.getEventType() == EventType.getEventType(eventType)) {
                     ArrayList<EventData> data = ei.getData();
                     ArrayList<WordEventData> wed = new ArrayList<WordEventData>();
                     for (int jj = 0; jj < data.size(); jj++) {
@@ -1502,8 +1573,10 @@ public class CSVReader {
     /**
      *
      * @param fileFullPath
-     * @param entityNFO
-     * @param eventNFO
+     * @param dataPosition
+     * @param entityType
+     * @param eventType
+     * @param label
      * @return
      * @throws IOException
      */
@@ -1520,9 +1593,9 @@ public class CSVReader {
             // DataPosition
             // EntityType
             // EntityLabel
-            if (e.getEntityInfo().getDataPosition() == dataPosition && e.getEntityInfo().getEntityType() == entityType && e.getEntityInfo().getEntityLabel().equals(label)) {
+            if (e.getEntityInfo().getDataPosition() == dataPosition && e.getEntityInfo().getEntityType() == EntityType.getEntityType(entityType) && e.getEntityInfo().getEntityLabel().equals(label)) {
                 EventInfo ei = (EventInfo) e;
-                if (ei.getEntityInfo().getEntityLabel().equals(label) && ei.getEventType() == eventType) {
+                if (ei.getEntityInfo().getEntityLabel().equals(label) && ei.getEventType() == EventType.getEventType(eventType)) {
                     ArrayList<EventData> data = ei.getData();
                     ArrayList<TextEventData> ted = new ArrayList<TextEventData>();
                     for (int jj = 0; jj < data.size(); jj++) {

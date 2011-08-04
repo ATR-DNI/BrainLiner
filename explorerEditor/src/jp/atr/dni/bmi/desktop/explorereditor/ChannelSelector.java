@@ -24,7 +24,7 @@ import jp.atr.dni.bmi.desktop.model.api.SegmentChannel;
 import jp.atr.dni.bmi.desktop.model.api.Workspace;
 import jp.atr.dni.bmi.desktop.neuroshareutils.AnalogInfo;
 
-import jp.atr.dni.bmi.desktop.neuroshareutils.CSVReader;
+import jp.atr.dni.bmi.desktop.neuroshareutils.readers.CSVReader;
 import jp.atr.dni.bmi.desktop.neuroshareutils.Entity;
 import jp.atr.dni.bmi.desktop.neuroshareutils.EntityType;
 import jp.atr.dni.bmi.desktop.neuroshareutils.EventInfo;
@@ -523,27 +523,28 @@ public class ChannelSelector extends javax.swing.JPanel implements ActionListene
                     NSReader nsr = new NSReader();
                     nsf = nsr.readNSFileOnlyInfo(this.generalFileInfo.getFilePath());
                     this.generalFileInfo.setNsObj(nsf);
-                } else if (fileType == FileType.PLX) {
-                    // Get nsObj from plx file.
-                    PlxReader plr = new PlxReader();
-                    nsf = plr.readPlxFileOnlyInfo(this.generalFileInfo.getFilePath());
-                    this.generalFileInfo.setNsObj(nsf);
-                } else if (fileType == FileType.NEV) {
-                    // Get nsObj from nev file.
-                    NevReader nevr = new NevReader();
-                    nsf = nevr.readNevFileOnlyInfo(this.generalFileInfo.getFilePath());
-                    this.generalFileInfo.setNsObj(nsf);
-                } else if (fileType == FileType.NSX) {
-                    // Get nsObj from ns1-ns9 file.
-                    NSXReader nsxr = new NSXReader();
-                    nsf = nsxr.readNsxFileAllData(this.generalFileInfo.getFilePath());
-                    this.generalFileInfo.setNsObj(nsf);
-                } else if (fileType == FileType.CSV) {
-                    // Get nsObj from csv file.
-                    CSVReader csvr = new CSVReader();
-                    nsf = csvr.readCsvFileAllData(this.generalFileInfo.getFilePath());
-                    this.generalFileInfo.setNsObj(nsf);
                 }
+//                } else if (fileType == FileType.PLX) {
+//                    // Get nsObj from plx file.
+//                    PlxReader plr = new PlxReader();
+//                    nsf = plr.readPlxFileOnlyInfo(this.generalFileInfo.getFilePath());
+//                    this.generalFileInfo.setNsObj(nsf);
+//                } else if (fileType == FileType.NEV) {
+//                    // Get nsObj from nev file.
+//                    NevReader nevr = new NevReader();
+//                    nsf = nevr.readNevFileOnlyInfo(this.generalFileInfo.getFilePath());
+//                    this.generalFileInfo.setNsObj(nsf);
+//                } else if (fileType == FileType.NSX) {
+//                    // Get nsObj from ns1-ns9 file.
+//                    NSXReader nsxr = new NSXReader();
+//                    nsf = nsxr.readNsxFileAllData(this.generalFileInfo.getFilePath());
+//                    this.generalFileInfo.setNsObj(nsf);
+//                } else if (fileType == FileType.CSV) {
+//                    // Get nsObj from csv file.
+//                    CSVReader csvr = new CSVReader();
+//                    nsf = csvr.readCsvFileAllData(this.generalFileInfo.getFilePath());
+//                    this.generalFileInfo.setNsObj(nsf);
+//                }
             }
 
             this.unAvailableChannelList.removeAllElements();

@@ -30,4 +30,25 @@ public enum EventType {
     *
     */
    EVENT_DWORD;
+   
+   /**
+    *
+    * @param identifier
+    * @return
+    */
+   public static EventType getEventType(long identifier) {
+      if (identifier == 0) {
+         return EVENT_TEXT;
+      } else if (identifier == 1) {
+         return EVENT_CSV;
+      } else if (identifier == 2) {
+         return EVENT_BYTE;
+      } else if (identifier == 3) {
+         return EVENT_WORD;
+      } else if (identifier == 4) {
+         return EVENT_DWORD;
+      } else {
+         return null;
+      }
+   }
 }

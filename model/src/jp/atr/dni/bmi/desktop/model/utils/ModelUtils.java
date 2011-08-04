@@ -30,9 +30,9 @@ public class ModelUtils {
 
    public static FileNameExtensionFilter[] getDataFileFileters() {
       ArrayList<FileNameExtensionFilter> filters = new ArrayList<FileNameExtensionFilter>();
-      filters.add(new FileNameExtensionFilter("ATR CSV (*.csv)", "csv"));
-      filters.add(new FileNameExtensionFilter("BlackRockMicroSystems (*.nev, *.ns1,..., *.ns9)", "ns1", "ns2", "ns3", "ns4", "ns5", "ns6", "ns7", "ns8", "ns9", "nev"));
-      filters.add(new FileNameExtensionFilter("Plexon (*.plx)", "plx"));
+//      filters.add(new FileNameExtensionFilter("ATR CSV (*.csv)", "csv"));
+//      filters.add(new FileNameExtensionFilter("BlackRockMicroSystems (*.nev, *.ns1,..., *.ns9)", "ns1", "ns2", "ns3", "ns4", "ns5", "ns6", "ns7", "ns8", "ns9", "nev"));
+//      filters.add(new FileNameExtensionFilter("Plexon (*.plx)", "plx"));
       filters.add(new FileNameExtensionFilter("Neuroshare (*.nsn)", "nsn"));
 
       return (FileNameExtensionFilter[]) filters.toArray(new FileNameExtensionFilter[0]);

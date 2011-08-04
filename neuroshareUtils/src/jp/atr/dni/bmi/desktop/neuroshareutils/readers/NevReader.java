@@ -282,8 +282,6 @@ public class NevReader {
                     temp.add(tempSegSourceInfo);
                     arraySegmentInfo.get(electrodeID - 1).setSegSourceInfos(
                             temp);
-                    arraySegmentInfo.get(electrodeID - 1).setSourceCount(
-                            arraySegmentInfo.get(electrodeID - 1).getSourceCount() + 1);
                     Tag tempTag = arraySegmentInfo.get(electrodeID - 1).getTag();
                     tempTag.setElemLength(tempTag.getElemLength() + 248);
                     arraySegmentInfo.get(electrodeID - 1).setTag(tempTag);
@@ -320,7 +318,7 @@ public class NevReader {
                     // EntityInfo
                     // 3 : SEGMENTENTITY, 0 : ItemCount
                     EntityInfo entityInfoSegment = new EntityInfo(label,
-                            EntityType.ENTITY_SEGMENT.ordinal(), 0);
+                            EntityType.ENTITY_SEGMENT, 0);
                     entityInfoSegment.setFilePath(nevFilePath);
                     entityInfoSegment.setDataPosition(position);
 
@@ -339,7 +337,7 @@ public class NevReader {
                     // EntityInfo
                     // 4 : NEURALEVENTENTITY, 0 : ItemCount
                     EntityInfo entityInfoNeural = new EntityInfo(label,
-                            EntityType.ENTITY_NEURAL.ordinal(), 0);
+                            EntityType.ENTITY_NEURAL, 0);
                     entityInfoNeural.setFilePath(nevFilePath);
                     entityInfoNeural.setDataPosition(position);
 
@@ -381,7 +379,7 @@ public class NevReader {
                     // EntityInfo
                     // 1 : EVENTENTITY, 0 : ItemCount
                     EntityInfo entityInfo = new EntityInfo(label,
-                            EntityType.ENTITY_EVENT.ordinal(), 0);
+                            EntityType.ENTITY_EVENT, 0);
                     entityInfo.setFilePath(nevFilePath);
                     entityInfo.setDataPosition(position);
 
@@ -389,7 +387,7 @@ public class NevReader {
 //                    tempEventInfo.setEventType(EventType.EVENT_WORD.ordinal());
                     // 2011/04/19 kharada modify to use DWordEventData instead of WordEventData.
                     // to setable uint16 values.
-                    tempEventInfo.setEventType(EventType.EVENT_DWORD.ordinal());
+                    tempEventInfo.setEventType(EventType.EVENT_DWORD);
                     if (mode == 0) {
                         tempEventInfo.setCsvDesc("triggered digital uint16");
                     } else if (mode == 1) {
@@ -572,7 +570,7 @@ public class NevReader {
                         tempSegData.setUnitID(tempUnitID);
                         tempSegData.setValues(tempValues);
 
-                        SegmentSourceInfo tempSegmentSourceInfo = tempSegmentSourceInfos.get(0);
+                        SegmentSourceInfo tempSegmentSourceInfo = new SegmentSourceInfo();
                         ArrayList<Double> tempArrayDoubleDataForSort = new ArrayList<Double>(
                                 tempArrayDoubleData);
                         Collections.sort(tempArrayDoubleDataForSort);
@@ -584,7 +582,7 @@ public class NevReader {
                         }
                         tempSegmentSourceInfo.setResolution(1);
 
-                        tempSegmentSourceInfos.set(0, tempSegmentSourceInfo);
+                        tempSegmentSourceInfos.add(tempSegmentSourceInfo);
 
                         tempSegmentInfo.setSegSourceInfos(tempSegmentSourceInfos);
                         tempSegmentInfo.setMaxSampleCount(tempArrayDoubleData.size());
@@ -592,7 +590,7 @@ public class NevReader {
                         tempSegmentInfo.setSampleRate(timeResolutionOfSamples);
                         tempSegmentInfo.setUnits("");
                         tempSegmentInfo.setSegData(tempSegData);
-                        tempSegmentInfo.setSegSourceInfos(tempSegmentSourceInfos);
+                        tempSegmentInfo.setSourceCount(tempSegmentSourceInfos.size());
 
                         Tag tempTagSegment = arraySegmentInfo.get(packetID - 1).getTag();
                         EntityInfo tempEntityInfoSegment = arraySegmentInfo.get(packetID - 1).getEntityInfo();
@@ -602,7 +600,8 @@ public class NevReader {
                                 + 8
                                 + 4
                                 + 8
-                                * tempArrayDoubleData.size());
+                                * tempArrayDoubleData.size()
+                                + 248);
                         tempEntityInfoSegment.setItemCount(tempEntityInfoSegment.getItemCount() + 1);
 
                         tempSegmentInfo.setTag(tempTagSegment);
@@ -918,8 +917,6 @@ public class NevReader {
                     temp.add(tempSegSourceInfo);
                     arraySegmentInfo.get(electrodeID - 1).setSegSourceInfos(
                             temp);
-                    arraySegmentInfo.get(electrodeID - 1).setSourceCount(
-                            arraySegmentInfo.get(electrodeID - 1).getSourceCount() + 1);
                     Tag tempTag = arraySegmentInfo.get(electrodeID - 1).getTag();
                     tempTag.setElemLength(tempTag.getElemLength() + 248);
                     arraySegmentInfo.get(electrodeID - 1).setTag(tempTag);
@@ -956,7 +953,7 @@ public class NevReader {
                     // EntityInfo
                     // 3 : SEGMENTENTITY, 0 : ItemCount
                     EntityInfo entityInfoSegment = new EntityInfo(label,
-                            EntityType.ENTITY_SEGMENT.ordinal(), 0);
+                            EntityType.ENTITY_SEGMENT, 0);
                     entityInfoSegment.setFilePath(nevFilePath);
                     entityInfoSegment.setDataPosition(position);
 
@@ -975,7 +972,7 @@ public class NevReader {
                     // EntityInfo
                     // 4 : NEURALEVENTENTITY, 0 : ItemCount
                     EntityInfo entityInfoNeural = new EntityInfo(label,
-                            EntityType.ENTITY_NEURAL.ordinal(), 0);
+                            EntityType.ENTITY_NEURAL, 0);
                     entityInfoNeural.setFilePath(nevFilePath);
                     entityInfoNeural.setDataPosition(position);
 
@@ -1017,7 +1014,7 @@ public class NevReader {
                     // EntityInfo
                     // 1 : EVENTENTITY, 0 : ItemCount
                     EntityInfo entityInfo = new EntityInfo(label,
-                            EntityType.ENTITY_EVENT.ordinal(), 0);
+                            EntityType.ENTITY_EVENT, 0);
                     entityInfo.setFilePath(nevFilePath);
                     entityInfo.setDataPosition(position);
 
@@ -1025,7 +1022,7 @@ public class NevReader {
 //                    tempEventInfo.setEventType(EventType.EVENT_WORD.ordinal());
                     // 2011/04/19 kharada modify to use DWordEventData instead of WordEventData.
                     // to setable uint16 values.
-                    tempEventInfo.setEventType(EventType.EVENT_DWORD.ordinal());
+                    tempEventInfo.setEventType(EventType.EVENT_DWORD);
                     if (mode == 0) {
                         tempEventInfo.setCsvDesc("triggered digital uint16");
                     } else if (mode == 1) {
@@ -1313,8 +1310,9 @@ public class NevReader {
     /**
      *
      * @param fileFullPath
-     * @param entityNFO
-     * @param segNFO
+     * @param dataPosition
+     * @param entityType
+     * @param label
      * @return
      * @throws IOException
      */
@@ -1332,7 +1330,7 @@ public class NevReader {
             // DataPosition
             // EntityType
             // EntityLabel
-            if (e.getEntityInfo().getDataPosition() == dataPosition && e.getEntityInfo().getEntityType() == entityType) {
+            if (e.getEntityInfo().getDataPosition() == dataPosition && e.getEntityInfo().getEntityType() == EntityType.getEntityType(entityType)) {
                 SegmentInfo si = (SegmentInfo) e;
                 if (si.getEntityInfo().getEntityLabel().equals(label)) {
                     return si.getSegData();
@@ -1346,7 +1344,9 @@ public class NevReader {
     /**
      *
      * @param fileFullPath
-     * @param entityNFO
+     * @param dataPosition
+     * @param entityType
+     * @param label
      * @return
      * @throws IOException
      */
@@ -1363,9 +1363,9 @@ public class NevReader {
             // DataPosition
             // EntityType
             // EntityLabel
-            if (e.getEntityInfo().getDataPosition() == dataPosition && e.getEntityInfo().getEntityType() == entityType && e.getEntityInfo().getEntityLabel().equals(label)) {
+            if (e.getEntityInfo().getDataPosition() == dataPosition && e.getEntityInfo().getEntityType() == EntityType.getEntityType(entityType) && e.getEntityInfo().getEntityLabel().equals(label)) {
                 NeuralInfo ni = (NeuralInfo) e;
-                if (ni.getEntityInfo().getEntityLabel().equals(entityType)) {
+                if (ni.getEntityInfo().getEntityLabel().equals(label)) {
                     return ni.getData();
                 }
             }
@@ -1408,8 +1408,9 @@ public class NevReader {
     /**
      *
      * @param fileFullPath
-     * @param entityNFO
-     * @param eventNFO
+     * @param dataPosition
+     * @param eventType
+     * @param label
      * @return
      * @throws IOException
      */
@@ -1426,9 +1427,9 @@ public class NevReader {
             // DataPosition
             // EntityType
             // EntityLabel
-            if (e.getEntityInfo().getDataPosition() == dataPosition && e.getEntityInfo().getEntityType() == eventType && e.getEntityInfo().getEntityLabel().equals(label)) {
+            if (e.getEntityInfo().getDataPosition() == dataPosition && e.getEntityInfo().getEntityType() == EntityType.ENTITY_EVENT && e.getEntityInfo().getEntityLabel().equals(label)) {
                 EventInfo ei = (EventInfo) e;
-                if (ei.getEntityInfo().getEntityLabel().equals(label) && ei.getEventType() == eventType) {
+                if (ei.getEntityInfo().getEntityLabel().equals(label) && ei.getEventType() == EventType.EVENT_BYTE) {
                     ArrayList<EventData> data = ei.getData();
                     ArrayList<ByteEventData> bed = new ArrayList<ByteEventData>();
                     for (int jj = 0; jj < data.size(); jj++) {
@@ -1446,8 +1447,9 @@ public class NevReader {
     /**
      *
      * @param fileFullPath
-     * @param entityNFO
-     * @param eventNFO
+     * @param dataPosition
+     * @param eventType
+     * @param label
      * @return
      * @throws IOException
      */
@@ -1464,9 +1466,9 @@ public class NevReader {
             // DataPosition
             // EntityType
             // EntityLabel
-            if (e.getEntityInfo().getDataPosition() == dataPosition && e.getEntityInfo().getEntityType() == eventType && e.getEntityInfo().getEntityLabel().equals(label)) {
+            if (e.getEntityInfo().getDataPosition() == dataPosition && e.getEntityInfo().getEntityType() == EntityType.ENTITY_EVENT && e.getEntityInfo().getEntityLabel().equals(label)) {
                 EventInfo ei = (EventInfo) e;
-                if (ei.getEntityInfo().getEntityLabel().equals(label) && ei.getEventType() == eventType) {
+                if (ei.getEntityInfo().getEntityLabel().equals(label) && ei.getEventType() == EventType.getEventType(eventType)) {
                     ArrayList<EventData> data = ei.getData();
                     ArrayList<DWordEventData> dwed = new ArrayList<DWordEventData>();
                     for (int jj = 0; jj < data.size(); jj++) {
@@ -1484,8 +1486,9 @@ public class NevReader {
     /**
      *
      * @param fileFullPath
-     * @param entityNFO
-     * @param eventNFO
+     * @param dataPosition
+     * @param eventType
+     * @param label
      * @return
      * @throws IOException
      */
@@ -1502,9 +1505,9 @@ public class NevReader {
             // DataPosition
             // EntityType
             // EntityLabel
-            if (e.getEntityInfo().getDataPosition() == dataPosition && e.getEntityInfo().getEntityType() == eventType && e.getEntityInfo().getEntityLabel().equals(label)) {
+            if (e.getEntityInfo().getDataPosition() == dataPosition && e.getEntityInfo().getEntityType() == EntityType.ENTITY_EVENT && e.getEntityInfo().getEntityLabel().equals(label)) {
                 EventInfo ei = (EventInfo) e;
-                if (ei.getEntityInfo().getEntityLabel().equals(label) && ei.getEventType() == eventType) {
+                if (ei.getEntityInfo().getEntityLabel().equals(label) && ei.getEventType() == EventType.EVENT_WORD) {
                     ArrayList<EventData> data = ei.getData();
                     ArrayList<WordEventData> wed = new ArrayList<WordEventData>();
                     for (int jj = 0; jj < data.size(); jj++) {
@@ -1522,8 +1525,9 @@ public class NevReader {
     /**
      *
      * @param fileFullPath
-     * @param entityNFO
-     * @param eventNFO
+     * @param dataPosition
+     * @param eventType
+     * @param label
      * @return
      * @throws IOException
      */
@@ -1540,9 +1544,9 @@ public class NevReader {
             // DataPosition
             // EntityType
             // EntityLabel
-            if (e.getEntityInfo().getDataPosition() == dataPosition && e.getEntityInfo().getEntityType() == eventType && e.getEntityInfo().getEntityLabel().equals(label)) {
+            if (e.getEntityInfo().getDataPosition() == dataPosition && e.getEntityInfo().getEntityType() == EntityType.ENTITY_EVENT && e.getEntityInfo().getEntityLabel().equals(label)) {
                 EventInfo ei = (EventInfo) e;
-                if (ei.getEntityInfo().getEntityLabel().equals(label) && ei.getEventType() == eventType) {
+                if (ei.getEntityInfo().getEntityLabel().equals(label) && ei.getEventType() == EventType.EVENT_TEXT) {
                     ArrayList<EventData> data = ei.getData();
                     ArrayList<TextEventData> ted = new ArrayList<TextEventData>();
                     for (int jj = 0; jj < data.size(); jj++) {

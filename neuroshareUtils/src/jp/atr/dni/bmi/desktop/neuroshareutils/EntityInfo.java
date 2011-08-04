@@ -11,7 +11,7 @@ package jp.atr.dni.bmi.desktop.neuroshareutils;
 public class EntityInfo {
 
     private String entityLabel;
-    private long entityType;
+    private EntityType entityType;
     private long itemCount;
     private long dataPosition;
     private String filePath;
@@ -28,7 +28,7 @@ public class EntityInfo {
      * @param entityType
      * @param itemCount
      */
-    public EntityInfo(String entityLabel, long entityType, long itemCount) {
+    public EntityInfo(String entityLabel, EntityType entityType, long itemCount) {
         super();
         if (entityLabel == null) {
             entityLabel = "";
@@ -57,14 +57,14 @@ public class EntityInfo {
     /**
      * @return the entityType
      */
-    public long getEntityType() {
+    public EntityType getEntityType() {
         return entityType;
     }
 
     /**
      * @param entityType the entityType to set
      */
-    public void setEntityType(long entityType) {
+    public void setEntityType(EntityType entityType) {
         this.entityType = entityType;
     }
 
@@ -115,20 +115,20 @@ public class EntityInfo {
      */
     public String getEntityTypeLabel() {
         String rtnVal = "";
-        switch ((int) this.entityType) {
-            case 0:
+        switch (this.entityType) {
+            case UNKNOWN:
                 rtnVal = "Unknown";
                 break;
-            case 1:
+            case ENTITY_EVENT:
                 rtnVal = "Event";
                 break;
-            case 2:
+            case ENTITY_ANALOG:
                 rtnVal = "Analog";
                 break;
-            case 3:
+            case ENTITY_SEGMENT:
                 rtnVal = "Segment";
                 break;
-            case 4:
+            case ENTITY_NEURAL:
                 rtnVal = "NeuralEvent";
                 break;
             default:

@@ -194,7 +194,7 @@ public class NSXReader {
                 // EntityInfo
                 // 2 : ANALOGENTITY, 0 : ItemCount
                 EntityInfo entityInfo = new EntityInfo(electrodeLabel,
-                        EntityType.ENTITY_ANALOG.ordinal(), 0);
+                        EntityType.ENTITY_ANALOG, 0);
                 entityInfo.setDataPosition(position);
                 entityInfo.setFilePath(nsxFilePath);
 
@@ -580,7 +580,7 @@ public class NSXReader {
                 // EntityInfo
                 // 2 : ANALOGENTITY, 0 : ItemCount
                 EntityInfo entityInfo = new EntityInfo(electrodeLabel,
-                        EntityType.ENTITY_ANALOG.ordinal(), 0);
+                        EntityType.ENTITY_ANALOG, 0);
                 entityInfo.setDataPosition(position);
                 entityInfo.setFilePath(nsxFilePath);
 
@@ -890,7 +890,7 @@ public class NSXReader {
             // DataPosition
             // EntityType
             // EntityLabel
-            if (e.getEntityInfo().getDataPosition() == dataPosition && e.getEntityInfo().getEntityType() == entityType && e.getEntityInfo().getEntityLabel().equals(label)) {
+            if (e.getEntityInfo().getDataPosition() == dataPosition && e.getEntityInfo().getEntityType() == EntityType.getEntityType(entityType) && e.getEntityInfo().getEntityLabel().equals(label)) {
                 AnalogInfo ai = (AnalogInfo) e;
                 if (ai.getEntityInfo().getEntityLabel().equals(label)) {
                     return ai.getData();

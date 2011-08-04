@@ -3,6 +3,7 @@ package jp.atr.dni.bmi.desktop.model.api;
 import java.util.ArrayList;
 import java.util.List;
 import jp.atr.dni.bmi.desktop.model.api.data.NSNSegmentData;
+import jp.atr.dni.bmi.desktop.neuroshareutils.EntityType;
 import jp.atr.dni.bmi.desktop.neuroshareutils.SegmentInfo;
 import jp.atr.dni.bmi.desktop.neuroshareutils.SegmentSourceInfo;
 
@@ -22,8 +23,10 @@ public final class SegmentChannel implements Channel<NSNSegmentData> {
         this.nsnEntity = nsnEntity;
         data = new NSNSegmentData(nsnEntity);
 
-        for (int i = 0; i < nsnEntity.getSegSourceInfos().size(); i++) {
-            segmentSources.add(nsnEntity.getSegSourceInfos().get(i));
+        if (nsnEntity.getSourceCount() > 0) {
+            for (int i = 0; i < nsnEntity.getSegSourceInfos().size(); i++) {
+                segmentSources.add(nsnEntity.getSegSourceInfos().get(i));
+            }
         }
     }
 
@@ -156,7 +159,7 @@ public final class SegmentChannel implements Channel<NSNSegmentData> {
     /**
      * @return the entityType
      */
-    public long getEntityType() {
+    public EntityType getEntityType() {
         return nsnEntity.getEntityInfo().getEntityType();
     }
 

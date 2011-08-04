@@ -10,6 +10,7 @@ import java.util.Calendar;
 import java.util.Collections;
 import java.util.GregorianCalendar;
 import jp.atr.dni.bmi.desktop.neuroshareutils.AnalogData;
+import jp.atr.dni.bmi.desktop.neuroshareutils.ConstantValues;
 import jp.atr.dni.bmi.desktop.neuroshareutils.Entity;
 import jp.atr.dni.bmi.desktop.neuroshareutils.EntityInfo;
 import jp.atr.dni.bmi.desktop.neuroshareutils.EntityType;
@@ -357,23 +358,24 @@ public class PlxReader {
 
                 // Tag
                 // 92 : ns_ENTITYINFO + ns_SEGMENTINFO
-                Tag tagSegment = new Tag(EntityType.ENTITY_SEGMENT, 92);
+                Tag tagSegment = new Tag(EntityType.ENTITY_SEGMENT, ConstantValues.NS_ENTITYINFO_LENGTH + ConstantValues.NS_SEGMENTINFO_LENGTH);
 
                 // EntityInfo
                 // 3 : SEGMENTENTITY, 0 : ItemCount
                 EntityInfo entityInfoSegment = new EntityInfo(schName,
-                        EntityType.ENTITY_SEGMENT.ordinal(), 0);
+                        EntityType.ENTITY_SEGMENT, 0);
 
                 // SegmentInfo
                 SegmentInfo tempSegmentInfo = new SegmentInfo(tagSegment,
                         entityInfoSegment);
 
                 // Modify members.
+                tempSegmentInfo.setSourceCount(0);
                 tempSegmentInfo.setMinSampleCount(numPointsWave);
                 tempSegmentInfo.setMinSampleCount(numPointsWave);
                 tempSegmentInfo.setSampleRate(waveformFreq);
                 tempSegmentInfo.setUnits(schName);
-
+                
                 // Add SegmentInfo to arraySegmentInfo
                 arraySegmentInfo.add(tempSegmentInfo);
 
@@ -390,7 +392,7 @@ public class PlxReader {
                 // EntityInfo
                 // 4 : NEURALEVENTENTITY, 0 : ItemCount
                 EntityInfo entityInfoNeural = new EntityInfo(schName,
-                        EntityType.ENTITY_NEURAL.ordinal(), 0);
+                        EntityType.ENTITY_NEURAL, 0);
 
                 // NeuralInfo
                 NeuralInfo tempNeuralInfo = new NeuralInfo(tagNeural,
@@ -670,9 +672,6 @@ public class PlxReader {
                         }
                         segSourceInfos.add(tempSegmentSourceInfo);
                         tempSegmentInfo.setSegSourceInfos(segSourceInfos);
-
-                        // Modify members of SegmentInfo.
-                        tempSegmentInfo.setSourceCount(tempSegmentInfo.getSourceCount() + 1);
 
                         // Modify members of EntityInfo.
                         EntityInfo tempEntityInfo01 = tempSegmentInfo.getEntityInfo();
@@ -1082,12 +1081,12 @@ public class PlxReader {
 
                 // Tag
                 // 92 : ns_ENTITYINFO + ns_SEGMENTINFO
-                Tag tagSegment = new Tag(EntityType.ENTITY_SEGMENT, 92);
+                Tag tagSegment = new Tag(EntityType.ENTITY_SEGMENT, ConstantValues.NS_ENTITYINFO_LENGTH + ConstantValues.NS_SEGMENTINFO_LENGTH);
 
                 // EntityInfo
                 // 3 : SEGMENTENTITY, 0 : ItemCount
                 EntityInfo entityInfoSegment = new EntityInfo(schName,
-                        EntityType.ENTITY_SEGMENT.ordinal(), 0);
+                        EntityType.ENTITY_SEGMENT, 0);
 
                 // SegmentInfo
                 SegmentInfo tempSegmentInfo = new SegmentInfo(tagSegment,
@@ -1098,7 +1097,7 @@ public class PlxReader {
                 tempSegmentInfo.setMinSampleCount(numPointsWave);
                 tempSegmentInfo.setSampleRate(waveformFreq);
                 tempSegmentInfo.setUnits(schName);
-
+                
                 // Add SegmentInfo to arraySegmentInfo
                 arraySegmentInfo.add(tempSegmentInfo);
 
@@ -1115,7 +1114,7 @@ public class PlxReader {
                 // EntityInfo
                 // 4 : NEURALEVENTENTITY, 0 : ItemCount
                 EntityInfo entityInfoNeural = new EntityInfo(schName,
-                        EntityType.ENTITY_NEURAL.ordinal(), 0);
+                        EntityType.ENTITY_NEURAL, 0);
 
                 // NeuralInfo
                 NeuralInfo tempNeuralInfo = new NeuralInfo(tagNeural,
@@ -1397,9 +1396,6 @@ public class PlxReader {
                         segSourceInfos.add(tempSegmentSourceInfo);
                         tempSegmentInfo.setSegSourceInfos(segSourceInfos);
 
-                        // Modify members of SegmentInfo.
-                        tempSegmentInfo.setSourceCount(tempSegmentInfo.getSourceCount() + 1);
-
                         // Modify members of EntityInfo.
                         EntityInfo tempEntityInfo01 = tempSegmentInfo.getEntityInfo();
                         tempEntityInfo01.setItemCount(tempEntityInfo01.getItemCount() + dWaveform.size());
@@ -1409,7 +1405,7 @@ public class PlxReader {
 
                         // Modify members of TagElement.
                         Tag tempTagElement01 = tempSegmentInfo.getTag();
-                        tempTagElement01.setElemLength(tempTagElement01.getElemLength() + 4
+                        tempTagElement01.setElemLength(tempTagElement01.getElemLength() + ConstantValues.NS_SEGSOURCEINFO_LENGTH + 4
                                 + 8 + 4 + 8 * dWaveform.size());
                         tempSegmentInfo.setTag(tempTagElement01);
 
@@ -1711,7 +1707,9 @@ public class PlxReader {
     /**
      *
      * @param fileFullPath
-     * @param entityNFO
+     * @param dataPosition
+     * @param entityType
+     * @param label
      * @return
      * @throws IOException
      */
@@ -1728,7 +1726,7 @@ public class PlxReader {
             // DataPosition
             // EntityType
             // EntityLabel
-            if (e.getEntityInfo().getDataPosition() == dataPosition && e.getEntityInfo().getEntityType() == entityType && e.getEntityInfo().getEntityLabel().equals(label)) {
+            if (e.getEntityInfo().getDataPosition() == dataPosition && e.getEntityInfo().getEntityType() == EntityType.getEntityType(entityType) && e.getEntityInfo().getEntityLabel().equals(label)) {
                 NeuralInfo ni = (NeuralInfo) e;
                 return ni.getData();
             }
@@ -1740,8 +1738,9 @@ public class PlxReader {
     /**
      *
      * @param fileFullPath
-     * @param entityNFO
-     * @param segNFO
+     * @param dataPosition
+     * @param entityType
+     * @param entityLabel
      * @return
      * @throws IOException
      */
@@ -1760,7 +1759,7 @@ public class PlxReader {
             // DataPosition
             // EntityType
             // EntityLabel
-            if (e.getEntityInfo().getDataPosition() == dataPosition && e.getEntityInfo().getEntityType() == entityType) {
+            if (e.getEntityInfo().getDataPosition() == dataPosition && e.getEntityInfo().getEntityType() == EntityType.getEntityType(entityType)) {
                 SegmentInfo si = (SegmentInfo) e;
                 if (si.getEntityInfo().getEntityLabel().equals(entityLabel)) {
                     return si.getSegData();

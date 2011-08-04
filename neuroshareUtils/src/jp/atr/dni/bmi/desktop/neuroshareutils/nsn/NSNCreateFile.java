@@ -194,7 +194,12 @@ public class NSNCreateFile {
             if (ConstantValues.NS_OK != this.segmentData.get(jj).saveSegmentInfo()) {
                return ConstantValues.NS_FILEERROR;
             }
+
             // SEGSOURCE (ns_SEGSOURCEINFO) * num of segSourceInfo
+            // if SEGSOURCE didn't exist, then skip.
+            if(this.segmentData.get(jj).getSegSourceInfos() == null){
+                continue;
+            }
             for (int kk = 0; kk < this.segmentData.get(jj).getSegSourceInfos().size(); kk++) {
                if (ConstantValues.NS_OK != this.segmentData.get(jj).saveSegSourceInfo(kk)) {
                   return ConstantValues.NS_FILEERROR;
@@ -334,15 +339,12 @@ public class NSNCreateFile {
             if (!tf.exists()) {
                continue;
             }
-            // Integrate intermediate files. (INFO : ns_SEGSOURCEINFO * num of segSourceInfo)
+            // Integrate and Delete intermediate files. (INFO : ns_SEGSOURCEINFO * num of segSourceInfo)
             for (int kk = 0; kk < this.segmentData.get(jj).getSegSourceInfos().size(); kk++) {
                if (ConstantValues.NS_OK != FileCat(this.outputFileName,
                        (this.segmentData.get(jj)).getIntermediateFileNameForSourceInfo().get(kk))) {
                   return ConstantValues.NS_FILEERROR;
                }
-            }
-            // Delete intermediate files. (INFO : ns_SEGSOURCEINFO * num of segSourceInfo)
-            for (int kk = 0; kk < this.segmentData.get(jj).getSegSourceInfos().size(); kk++) {
                if (!(new File(this.segmentData.get(jj).getIntermediateFileNameForSourceInfo().get(kk)).delete())) {
                   return ConstantValues.NS_FILEERROR;
                }

@@ -137,6 +137,7 @@ public class SegmentInfo extends Entity {
      */
     public void setSegSourceInfos(ArrayList<SegmentSourceInfo> segSourceInfos) {
         this.segSourceInfos = segSourceInfos;
+        this.sourceCount = segSourceInfos.size();
     }
 
     /**

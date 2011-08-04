@@ -21,7 +21,7 @@ public class EventInfo extends Entity {
      * separated values), ns_EVENT_BYTE 2 (8-bit binary values), ns_EVENT_WORD 3 (16-bit binary
      * values), and ns_EVENT_DWORD 4 (32-bit binary values).
      */
-    private long eventType;
+    private EventType eventType;
     /**
      * Minimum number of bytes that can be returned for an Event.
      */
@@ -52,7 +52,7 @@ public class EventInfo extends Entity {
      * @param maxDataLength
      * @param csvDesc
      */
-    public EventInfo(Tag tag, EntityInfo entityInfo, long eventType, long minDataLength, long maxDataLength,
+    public EventInfo(Tag tag, EntityInfo entityInfo, EventType eventType, long minDataLength, long maxDataLength,
             String csvDesc) {
         super(tag, entityInfo);
 
@@ -69,14 +69,14 @@ public class EventInfo extends Entity {
     /**
      * @return the eventType
      */
-    public long getEventType() {
+    public EventType getEventType() {
         return eventType;
     }
 
     /**
      * @param eventType the eventType to set
      */
-    public void setEventType(long eventType) {
+    public void setEventType(EventType eventType) {
         this.eventType = eventType;
     }
 
@@ -135,4 +135,33 @@ public class EventInfo extends Entity {
     public void setData(ArrayList<EventData> data) {
         this.data = data;
     }
+    
+        /**
+     * @return the label of entity type.
+     */
+    public String getEventTypeLabel() {
+        String rtnVal = "";
+        switch (this.eventType) {
+            case EVENT_TEXT:
+                rtnVal = "Text";
+                break;
+            case EVENT_CSV:
+                rtnVal = "Csv";
+                break;
+            case EVENT_BYTE:
+                rtnVal = "Byte";
+                break;
+            case EVENT_WORD:
+                rtnVal = "Word";
+                break;
+            case EVENT_DWORD:
+                rtnVal = "DWord";
+                break;
+            default:
+                rtnVal = "Unknown";
+                break;
+        }
+        return rtnVal;
+    }
+
 }

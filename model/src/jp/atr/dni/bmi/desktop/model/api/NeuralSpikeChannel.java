@@ -1,6 +1,8 @@
 package jp.atr.dni.bmi.desktop.model.api;
 
 import jp.atr.dni.bmi.desktop.model.api.data.NSNNeuralSpikeData;
+import jp.atr.dni.bmi.desktop.neuroshareutils.EntityInfo;
+import jp.atr.dni.bmi.desktop.neuroshareutils.EntityType;
 import jp.atr.dni.bmi.desktop.neuroshareutils.NeuralInfo;
 
 /**
@@ -121,15 +123,17 @@ public final class NeuralSpikeChannel implements Channel<NSNNeuralSpikeData> {
    /**
     * @return the entityType
     */
-   public long getEntityType() {
+   public EntityType getEntityType() {
       return nsnEntity.getEntityInfo().getEntityType();
    }
 
    /**
     * @param entityType the entityType to set
     */
-   public void setEntityType(long entityType) {
-      nsnEntity.getEntityInfo().setEntityType(entityType);
+   public void setEntityType(EntityType entityType) {
+        EntityInfo entityInfo = nsnEntity.getEntityInfo();
+        entityInfo.setEntityType(entityType);
+        nsnEntity.setEntityInfo(entityInfo);
    }
 
    @Override

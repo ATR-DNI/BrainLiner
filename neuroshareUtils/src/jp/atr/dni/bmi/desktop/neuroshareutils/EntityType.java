@@ -11,6 +11,10 @@ package jp.atr.dni.bmi.desktop.neuroshareutils;
 public enum EntityType {
 
    /**
+    * 
+    */
+   UNKNOWN,
+   /**
     *
     */
    ENTITY_EVENT,
@@ -29,11 +33,7 @@ public enum EntityType {
    /**
     *
     */
-   INFO_FILE,
-   /**
-    * 
-    */
-   UNKNOWN;
+   INFO_FILE;
 
    /**
     *
@@ -42,15 +42,15 @@ public enum EntityType {
     */
    public static EntityType getEntityType(long nsnIdentifier) {
       if (nsnIdentifier == 1) {
-         return EntityType.ENTITY_EVENT;
+         return ENTITY_EVENT;
       } else if (nsnIdentifier == 2) {
-         return EntityType.ENTITY_ANALOG;
+         return ENTITY_ANALOG;
       } else if (nsnIdentifier == 3) {
-         return EntityType.ENTITY_SEGMENT;
+         return ENTITY_SEGMENT;
       } else if (nsnIdentifier == 4) {
-         return EntityType.ENTITY_NEURAL;
+         return ENTITY_NEURAL;
       } else if (nsnIdentifier == 5) {
-         return EntityType.INFO_FILE;
+         return INFO_FILE;
       } else {
          return EntityType.UNKNOWN;
       }

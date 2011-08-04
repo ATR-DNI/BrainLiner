@@ -2,6 +2,8 @@ package jp.atr.dni.bmi.desktop.model.api;
 
 import jp.atr.dni.bmi.desktop.model.api.data.NSNAnalogData;
 import jp.atr.dni.bmi.desktop.neuroshareutils.AnalogInfo;
+import jp.atr.dni.bmi.desktop.neuroshareutils.EntityInfo;
+import jp.atr.dni.bmi.desktop.neuroshareutils.EntityType;
 
 /**
  *
@@ -343,14 +345,17 @@ public final class AnalogChannel implements Channel<NSNAnalogData> {
    /**
     * @return the entityType
     */
-   public long getEntityType() {
+   public EntityType getEntityType() {
       return nsnEntity.getEntityInfo().getEntityType();
    }
 
    /**
     * @param entityType the entityType to set
     */
-   public void setEntityType(long entityType) {
+   public void setEntityType(EntityType entityType) {
+        EntityInfo entityInfo = nsnEntity.getEntityInfo();
+        entityInfo.setEntityType(entityType);
+        nsnEntity.setEntityInfo(entityInfo);
    }
 
    @Override

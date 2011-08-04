@@ -5,7 +5,10 @@
 package jp.atr.dni.bmi.desktop.model.api;
 
 import jp.atr.dni.bmi.desktop.model.api.data.NSNEventData;
+import jp.atr.dni.bmi.desktop.neuroshareutils.EntityInfo;
+import jp.atr.dni.bmi.desktop.neuroshareutils.EntityType;
 import jp.atr.dni.bmi.desktop.neuroshareutils.EventInfo;
+import jp.atr.dni.bmi.desktop.neuroshareutils.EventType;
 
 /**
  *
@@ -71,14 +74,14 @@ public final class EventChannel implements Channel<NSNEventData> {
    /**
     * @return the eventType
     */
-   public long getEventType() {
+   public EventType getEventType() {
       return nsnEntity.getEventType();
    }
 
    /**
     * @param eventType the eventType to set
     */
-   public void setEventType(long eventType) {
+   public void setEventType(EventType eventType) {
       nsnEntity.setEventType(eventType);
    }
 
@@ -141,15 +144,17 @@ public final class EventChannel implements Channel<NSNEventData> {
    /**
     * @return the entityType
     */
-   public long getEntityType() {
+   public EntityType getEntityType() {
       return nsnEntity.getEntityInfo().getEntityType();
    }
 
    /**
     * @param entityType the entityType to set
     */
-   public void setEntityType(long entityType) {
-      nsnEntity.getEntityInfo().setEntityType(entityType);
+   public void setEntityType(EntityType entityType) {
+        EntityInfo entityInfo = nsnEntity.getEntityInfo();
+        entityInfo.setEntityType(entityType);
+        nsnEntity.setEntityInfo(entityInfo);
    }
 
    @Override

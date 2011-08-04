@@ -17,8 +17,6 @@ import jp.atr.dni.bmi.desktop.model.api.EventChannel;
 import jp.atr.dni.bmi.desktop.model.api.NeuralSpikeChannel;
 import jp.atr.dni.bmi.desktop.model.api.SegmentChannel;
 import jp.atr.dni.bmi.desktop.model.api.Workspace;
-import jp.atr.dni.bmi.desktop.model.api.data.APIList;
-import jp.atr.dni.bmi.desktop.model.api.data.NSNSegmentSource;
 import jp.atr.dni.bmi.desktop.model.utils.DoubleInputVerifierForJTextField;
 import jp.atr.dni.bmi.desktop.model.utils.UnsignedIntegerInputVerifierForJTextField;
 import jp.atr.dni.bmi.desktop.neuroshareutils.SegmentSourceInfo;
@@ -840,7 +838,6 @@ public class ChannelPropertyEditor extends javax.swing.JPanel implements ActionL
         gridBagConstraints.weighty = 1.0;
         add(jPanel1, gridBagConstraints);
     }// </editor-fold>//GEN-END:initComponents
-
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JTextField analogChannelLabel;
     private javax.swing.JTextField analogChannelType;
@@ -1091,9 +1088,6 @@ public class ChannelPropertyEditor extends javax.swing.JPanel implements ActionL
             EventChannel eChannel = (EventChannel) channel;
             // Set Values.
             eChannel.setLabel(eventChannelLabel.getText());
-            eChannel.setEntityType(WIDTH);
-
-
 
 //         EntityInfo ei = edittedEntity.getEntityInfo();
 //         ei.setEntityLabel(eventChannelLabel.getText());

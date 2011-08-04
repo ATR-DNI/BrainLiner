@@ -110,9 +110,9 @@ public class CreateNewNeuroshareFile {
                 NSNEventData timeLabelData = channel.getData();
                 int eventDataSize = timeLabelData.getEvents().size();
 
-                long eventType = channel.getEventType();
+                EventType eventType = channel.getEventType();
 
-                if (eventType == EventType.EVENT_TEXT.ordinal()) {
+                if (eventType == EventType.EVENT_TEXT) {
                     // Get Event Data
                     for (int ii = 0; ii < eventDataSize; ii++) {
                         // ns_EVENT_TEXT
@@ -122,7 +122,7 @@ public class CreateNewNeuroshareFile {
                             // add error. - input arg error - or intermediate file i/o error.
                         }
                     }
-                } else if (eventType == EventType.EVENT_BYTE.ordinal()) {
+                } else if (eventType == EventType.EVENT_BYTE) {
                     // Get Event Data
                     for (int ii = 0; ii < eventDataSize; ii++) {
                         // ns_EVENT_BYTE
@@ -133,7 +133,7 @@ public class CreateNewNeuroshareFile {
                             // add error. - input arg error - or intermediate file i/o error.
                         }
                     }
-                } else if (eventType == EventType.EVENT_WORD.ordinal()) {
+                } else if (eventType == EventType.EVENT_WORD) {
                     // Get Event Data
                     for (int ii = 0; ii < eventDataSize; ii++) {
                         // ns_EVENT_WORD
@@ -144,7 +144,8 @@ public class CreateNewNeuroshareFile {
                             // add error. - input arg error - or intermediate file i/o error.
                         }
                     }
-                } else if (eventType == EventType.EVENT_DWORD.ordinal()) {// Get Event Data
+                } else if (eventType == EventType.EVENT_DWORD) {
+                    // Get Event Data
                     for (int ii = 0; ii < eventDataSize; ii++) {
                         // ns_EVENT_DWORD
 //                                    rtnval2 = nsEd.addEventData(tLData.getTimeStamp(ii), (Integer) (tLData.getValue(ii)));
