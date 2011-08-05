@@ -19,9 +19,6 @@ import jp.atr.dni.bmi.desktop.neuroshareutils.nsn.NSNSegmentData;
 /**
  * Create Neuroshare File.</br></br>
  * 
- * @param NeuroshareFile nsObj
- * @param String fileFullPath
- * @return Nothing
  * @version 2010/08/09
  * @author Keiji Harada [*1]</br>
  * [*1] ATR Intl. Conputational Neuroscience Labs, Decoding Group
@@ -29,7 +26,8 @@ import jp.atr.dni.bmi.desktop.neuroshareutils.nsn.NSNSegmentData;
 public class NsnFileModelConverter {
 
     /**
-     * @param args
+     * @param nsObj
+     * @param fileFullPath
      */
     public static void ModelConvert(NeuroshareFile nsObj, String fileFullPath) {
 
@@ -374,7 +372,7 @@ public class NsnFileModelConverter {
 
             }
         }
-        
+
         // Close and create.
         int rtnval7 = nsFile.closeFile();
         if (rtnval7 != 0) {
