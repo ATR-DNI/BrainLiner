@@ -739,7 +739,15 @@ public class ExplorerNode extends AbstractNode {
 
                     ArrayList<SegmentSourceInfo> segSourceInfos = segmentInfo.getSegSourceInfos();
                     if (segSourceInfos != null) {
-                        for (int jj = 0; jj < segSourceInfos.size(); jj++) {
+                        
+                        // Display Count Limitation to save memory.
+                        int displayCountLimit = segSourceInfos.size();
+                        if(displayCountLimit > 10){
+                            displayCountLimit = 10;
+                        }
+                        
+                        for (int jj = 0; jj < displayCountLimit; jj++) {
+//                        for (int jj = 0; jj < segSourceInfos.size(); jj++) {
                             SegmentSourceInfo ss = segSourceInfos.get(jj);
 
                             // Create Sheet.
