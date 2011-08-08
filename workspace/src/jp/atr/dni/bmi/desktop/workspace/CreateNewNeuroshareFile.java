@@ -112,6 +112,9 @@ public class CreateNewNeuroshareFile {
 
                 EventType eventType = channel.getEventType();
 
+                // Open the data file. 
+                nsEd.openDataFile();
+
                 if (eventType == EventType.EVENT_TEXT) {
                     // Get Event Data
                     for (int ii = 0; ii < eventDataSize; ii++) {
@@ -156,6 +159,8 @@ public class CreateNewNeuroshareFile {
                         }
                     }
                 }
+                // Close the data file.
+                nsEd.closeDataFile();
 
             } else if (channelType
                     == ChannelType.ANALOG) {  // Analog
@@ -211,6 +216,9 @@ public class CreateNewNeuroshareFile {
                 NSNAnalogData timeValData = analogChannel.getData();
                 int analogDataSize = timeValData.getTimeStamps().size();
 
+                // Open the data file. 
+                nsAd.openDataFile();
+
                 // Add Analog Data
                 for (int ii = 0; ii < analogDataSize; ii++) {
                     // If you want to add multiple rows data, repeat to call add***Data.
@@ -226,6 +234,11 @@ public class CreateNewNeuroshareFile {
                         // add error. - input arg error - or intermediate file i/o error.
                     }
                 }
+
+                // Close the data file.
+                nsAd.closeDataFile();
+
+
             } else if (channelType
                     == ChannelType.SEGMENT) { // Segment
                 // Create new Segment Entity (input arg is ns_ENTITYINFO.szEntityLabel.)
@@ -267,6 +280,9 @@ public class CreateNewNeuroshareFile {
                 NSNSegmentData timeValIdData = channel.getData();
                 int segmentDataSize = timeValIdData.getTimeStamps().size();
 
+                // Open the data file. 
+                nsSD.openDataFile();
+
                 for (int kk = 0; kk < segmentDataSize; kk++) {
                     APIList<Double> values = timeValIdData.getValues().get(kk);
                     double[] dVals = new double[values.size()];
@@ -279,6 +295,10 @@ public class CreateNewNeuroshareFile {
                     }
 
                 }
+
+                // Close the data file.
+                nsSD.closeDataFile();
+
                 // Modify ns_SEGSOURCEINFO.
                 // Get it.
                 // Be care! segSourceID is needed!!!
@@ -356,12 +376,19 @@ public class CreateNewNeuroshareFile {
                 NSNNeuralSpikeData timeData = channel.getData();
                 int neuralDataSize = timeData.getTimeStamps().size();
 
+                // Open the data file. 
+                nsNED.openDataFile();
+
+
                 for (int jj = 0; jj < neuralDataSize; jj++) {
                     int rtnval9 = nsNED.addNeuralEventData(timeData.getTimeStamps().get(jj));
                     if (rtnval9 != 0) {
                         // add error. - input arg error - or intermediate file i/o error.
                     }
                 }
+
+                // Close the data file.
+                nsNED.closeDataFile();
             }
         }
 // Close and create.

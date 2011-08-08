@@ -10,6 +10,7 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Arrays;
+import javax.swing.JOptionPane;
 import jp.atr.dni.bmi.desktop.neuroshareutils.ConstantValues;
 
 /**
@@ -24,6 +25,8 @@ public class NSNAnalogData {
     private NSNTagElement tagElement;
     private NSNEntityInfo entityInfo;
     private NSNAnalogInfo analogInfo;
+    private FileOutputStream dataFileFOS;
+    private DataOutputStream dataFileDOS;
 
     /**
      * @param ID
@@ -40,6 +43,8 @@ public class NSNAnalogData {
         this.tagElement.addDwElemLength(40);
         this.analogInfo = new NSNAnalogInfo();
         this.tagElement.addDwElemLength(264);
+        this.dataFileFOS = null;
+        this.dataFileDOS = null;
     }
 
     /**
@@ -66,9 +71,6 @@ public class NSNAnalogData {
     public int addAnalogData(double dTimestamp, double[] dAnalogValue) {
 
         int rtnVal = ConstantValues.NS_OK;
-        File tempFile = null;
-        FileOutputStream fos = null;
-        DataOutputStream dos = null;
 
         try {
             // Collect values to rewrite object.
@@ -78,10 +80,6 @@ public class NSNAnalogData {
             double dMaxInTheArray = dCopyAnalogValue[dCopyAnalogValue.length - 1];
             double dMinInTheArray = dCopyAnalogValue[0];
 
-            // Open the intermediatefile. (use FileOutputStream, DataOutputStream.)
-            tempFile = new File(this.getIntermediateFileNameForData());
-            fos = new FileOutputStream(tempFile, true);
-            dos = new DataOutputStream(fos);
 
             // Add dTimestamp, dwDataCount, dAnalogValue[0] - dAnalogValue[dwDataCount - 1]
             // Write in BIG Endian (JAVA Default)
@@ -91,15 +89,11 @@ public class NSNAnalogData {
              */
 
             // Write in LITTLE Endian (MATLAB Default)
-            dos.writeLong(Long.reverseBytes(Double.doubleToLongBits(dTimestamp)));
-            dos.writeInt(Integer.reverseBytes(dwDataCount));
+            this.dataFileDOS.writeLong(Long.reverseBytes(Double.doubleToLongBits(dTimestamp)));
+            this.dataFileDOS.writeInt(Integer.reverseBytes(dwDataCount));
             for (int jj = 0; jj < dAnalogValue.length; jj++) {
-                dos.writeLong(Long.reverseBytes(Double.doubleToLongBits(dAnalogValue[jj])));
+                this.dataFileDOS.writeLong(Long.reverseBytes(Double.doubleToLongBits(dAnalogValue[jj])));
             }
-
-            // Close the intermediatefile. (use FileOutputStream, DataOutputStream.)
-            dos.close();
-            fos.close();
 
             // Add this.tagElement.addDwElemLength(some value).
             this.getTagElement().addDwElemLength(8 + 4 + 8 * dwDataCount);
@@ -119,13 +113,6 @@ public class NSNAnalogData {
             // Then, NS_OK.
             rtnVal = ConstantValues.NS_OK;
 
-        } catch (FileNotFoundException e) {
-            // File Not Found.
-            e.printStackTrace();
-
-            // Then, NS_FILEERROR.
-            rtnVal = ConstantValues.NS_FILEERROR;
-
         } catch (IOException e) {
             // File I/O error.
             e.printStackTrace();
@@ -133,21 +120,6 @@ public class NSNAnalogData {
             // Then, NS_FILEERROR.
             rtnVal = ConstantValues.NS_FILEERROR;
 
-        } finally {
-            try {
-                if (!dos.equals(null)) {
-                    dos.close();
-                }
-                if (!fos.equals(null)) {
-                    fos.close();
-                }
-
-            } catch (IOException e) {
-                // May be sequence doesn't reach here.
-                e.printStackTrace();
-                rtnVal = ConstantValues.NS_FILEERROR;
-
-            }
         }
 
         // return the value.
@@ -335,5 +307,30 @@ public class NSNAnalogData {
      */
     public void setAnalogInfo(NSNAnalogInfo analogInfo) {
         this.analogInfo = analogInfo;
+    }
+
+    public void openDataFile() {
+        // Open Data File.        
+        try {
+            this.dataFileFOS = new FileOutputStream(intermediateFileNameForData, true);
+            this.dataFileDOS = new DataOutputStream(this.dataFileFOS);
+        } catch (FileNotFoundException fileNotFoundException) {
+            JOptionPane.showMessageDialog(null, "File Open Error");
+        }
+    }
+
+    public void closeDataFile() {
+        // Close Data File.
+        try {
+            if (this.dataFileDOS != null) {
+                this.dataFileDOS.close();
+            }
+
+            if (this.dataFileFOS != null) {
+                this.dataFileFOS.close();
+            }
+        } catch (IOException iOException) {
+            JOptionPane.showMessageDialog(null, "File Close Error");
+        }
     }
 }

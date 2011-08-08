@@ -136,6 +136,9 @@ public class NSNFileModelConverter {
                     int rtnval2 = 0;
                     EventType eventType = eventInfo.getEventType();
 
+                    // Open the data file. 
+                    nsEd.openDataFile();
+
                     if (eventType == EventType.EVENT_TEXT) {
                         // Get Event Data
                         //                                    TextEventData ted = (TextEventData) (nsReader.getEventData(srcFileFullPath, ei, eventInfo)).get(j);
@@ -181,6 +184,8 @@ public class NSNFileModelConverter {
                             }
                         }
                     }
+                    // Close the data file.
+                    nsEd.closeDataFile();
 
                 } else if (entityType == EntityType.ENTITY_ANALOG) {
                     // Analog
@@ -234,6 +239,9 @@ public class NSNFileModelConverter {
                     // Get Analog Data
                     ArrayList<AnalogData> ad = nsReader.getAnalogData(srcFileFullPath, ei.getDataPosition(), ei.getItemCount());
 
+                    // Open the data file. 
+                    nsAd.openDataFile();
+
                     // Add Analog Data
                     for (int ianalog = 0; ianalog < ad.size(); ianalog++) {
                         // If you want to add multiple rows data, repeat to call add***Data.
@@ -248,6 +256,10 @@ public class NSNFileModelConverter {
                             // add error. - input arg error - or intermediate file i/o error.
                         }
                     }
+
+                    // Close the data file.
+                    nsAd.closeDataFile();
+
                 } else if (entityType == EntityType.ENTITY_SEGMENT) {
                     // Segment
                     // Create new Segment Entity (input arg is ns_ENTITYINFO.szEntityLabel.)
@@ -290,6 +302,9 @@ public class NSNFileModelConverter {
                     ArrayList<Double> timestampData = sd.getTimeStamp();
                     ArrayList<Long> unitIDData = sd.getUnitID();
                     ArrayList<ArrayList<Double>> value = sd.getValues();
+
+                    // Open the data file. 
+                    nsSD.openDataFile();
 
                     // Add Segment Data
                     // If you want to add multiple rows data, repeat to call add***Data.
@@ -346,6 +361,10 @@ public class NSNFileModelConverter {
                             // set Error. - nsaSegmentInfo includes error
                         }
                     }
+
+                    // Close the data file.
+                    nsSD.closeDataFile();
+
                 } else if (entityType == EntityType.ENTITY_NEURAL) {
                     // Neural
                     // Create new Neural Event Entity (input arg is ns_ENTITYINFO.szEntityLabel.)
@@ -383,12 +402,18 @@ public class NSNFileModelConverter {
                     // Get Neural Event Data
                     ArrayList<Double> d = nsReader.getNeuralData(srcFileFullPath, ei.getDataPosition(), ei.getItemCount());
 
+                    // Open the data file. 
+                    nsNED.openDataFile();
+
                     for (int jj = 0; jj < d.size(); jj++) {
                         int rtnval9 = nsNED.addNeuralEventData(d.get(jj));
                         if (rtnval9 != 0) {
                             // add error. - input arg error - or intermediate file i/o error.
                         }
                     }
+
+                    // Close the data file.
+                    nsNED.closeDataFile();
                 }
             }
 

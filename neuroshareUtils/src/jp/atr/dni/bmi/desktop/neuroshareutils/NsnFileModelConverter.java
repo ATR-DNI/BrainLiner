@@ -3,6 +3,7 @@
  */
 package jp.atr.dni.bmi.desktop.neuroshareutils;
 
+import java.io.DataOutputStream;
 import java.util.ArrayList;
 import jp.atr.dni.bmi.desktop.neuroshareutils.nsa.NSAAnalogInfo;
 import jp.atr.dni.bmi.desktop.neuroshareutils.nsa.NSAEventInfo;
@@ -30,6 +31,9 @@ public class NsnFileModelConverter {
      * @param fileFullPath
      */
     public static void ModelConvert(NeuroshareFile nsObj, String fileFullPath) {
+
+        // DataOutputStream : To save number of open/close.
+        DataOutputStream dos = null;
 
         // Create the Neuroshare file.
         NSNCreateFile nsFile = new NSNCreateFile(fileFullPath);
@@ -114,6 +118,9 @@ public class NsnFileModelConverter {
                     // Get Event Data
                     ArrayList<EventData> eventData = eventInfo.getData();
 
+                    // Open the data file. 
+                    nsEd.openDataFile();
+
                     for (int j = 0; j < eventData.size(); j++) {
                         // Add Event Data
                         // If you want to add multiple rows data, repeat to call add***Data.
@@ -158,6 +165,9 @@ public class NsnFileModelConverter {
 
                         }
                     }
+
+                    // Close the data file.
+                    nsEd.closeDataFile();
 
                     break;
                 case ENTITY_ANALOG:
@@ -209,6 +219,9 @@ public class NsnFileModelConverter {
                         continue;
                     }
 
+                    // Open the data file. 
+                    nsAd.openDataFile();
+
                     // Add Analog Data
                     for (int ianalog = 0; ianalog < analogInfo.getData().size(); ianalog++) {
                         // If you want to add multiple rows data, repeat to call add***Data.
@@ -223,6 +236,9 @@ public class NsnFileModelConverter {
                             // add error. - input arg error - or intermediate file i/o error.
                         }
                     }
+
+                    // Close the data file.
+                    nsAd.closeDataFile();
 
                     break;
                 case ENTITY_SEGMENT:
@@ -264,6 +280,9 @@ public class NsnFileModelConverter {
                     ArrayList<Double> timestampData = segmentInfo.getSegData().getTimeStamp();
                     ArrayList<Long> unitIDData = segmentInfo.getSegData().getUnitID();
                     ArrayList<ArrayList<Double>> value = segmentInfo.getSegData().getValues();
+
+                    // Open the data file. 
+                    nsSD.openDataFile();
 
                     // Add Segment Data
                     // If you want to add multiple rows data, repeat to call add***Data.
@@ -320,6 +339,10 @@ public class NsnFileModelConverter {
                             // set Error. - nsaSegmentInfo includes error
                         }
                     }
+
+                    // Close the data file.
+                    nsSD.closeDataFile();
+
                     break;
                 case ENTITY_NEURAL:
                     // Neural
@@ -355,6 +378,9 @@ public class NsnFileModelConverter {
                         continue;
                     }
 
+                    // Open the data file. 
+                    nsNED.openDataFile();
+
                     // Add Neural Event Data
                     ArrayList<Double> d = neuralInfo.getData();
                     for (int jj = 0; jj < d.size(); jj++) {
@@ -363,6 +389,10 @@ public class NsnFileModelConverter {
                             // add error. - input arg error - or intermediate file i/o error.
                         }
                     }
+
+                    // Close the data file.
+                    nsNED.closeDataFile();
+
                     break;
                 case INFO_FILE:
                     // FileInfo
