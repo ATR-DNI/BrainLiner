@@ -3,7 +3,6 @@
  */
 package jp.atr.dni.bmi.desktop.neuroshareutils;
 
-import java.io.DataOutputStream;
 import java.util.ArrayList;
 import jp.atr.dni.bmi.desktop.neuroshareutils.nsa.NSAAnalogInfo;
 import jp.atr.dni.bmi.desktop.neuroshareutils.nsa.NSAEventInfo;
@@ -31,9 +30,6 @@ public class NsnFileModelConverter {
      * @param fileFullPath
      */
     public static void ModelConvert(NeuroshareFile nsObj, String fileFullPath) {
-
-        // DataOutputStream : To save number of open/close.
-        DataOutputStream dos = null;
 
         // Create the Neuroshare file.
         NSNCreateFile nsFile = new NSNCreateFile(fileFullPath);
