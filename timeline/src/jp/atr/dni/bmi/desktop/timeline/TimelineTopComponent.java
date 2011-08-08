@@ -525,8 +525,9 @@ public final class TimelineTopComponent extends TopComponent implements GLEventL
 
       double width = getWidth();
       double height = getHeight();
-      transform = new AffineTransform(1, 0, 0, 1, 0, 0);
+//      transform = new AffineTransform(1, 0, 0, 1, 0, 0);
 //      transform.translate(0.5 * width, 0.5 * height);
+      transform.setToIdentity();
       transform.translate(translationX, translationY);
       transform.scale(scale, scale);
 
@@ -537,7 +538,7 @@ public final class TimelineTopComponent extends TopComponent implements GLEventL
 
       //Calc the bounding points for the data-space from the screen coordinates
       minPoint = getVirtualCoordinates(0, 0);
-      maxPoint = getVirtualCoordinates(getWidth(), getHeight());
+      maxPoint = getVirtualCoordinates(width, height);
    }
 
    private void buildTransforms(Point2D point) {
@@ -547,9 +548,9 @@ public final class TimelineTopComponent extends TopComponent implements GLEventL
       
       Point2D p2 = inverseTransform.transform(point, null);
 
-      transform = new AffineTransform(1, 0, 0, 1, 0, 0);
+//      transform = new AffineTransform(1, 0, 0, 1, 0, 0);
 //      transform.translate(0.5 * width, 0.5 * height);
-      transform.translate(translationX, translationY);
+
 //      System.out.println("tx: " + translationX + "\tty: " + translationY);
 
 //      Translate by (x,y,0) to put the origin at those coordinates
@@ -560,6 +561,10 @@ public final class TimelineTopComponent extends TopComponent implements GLEventL
       transform.translate(point.getX(), point.getY());
       transform.scale(scale, scale);
       transform.translate(-p2.getX(), -p2.getY());
+      
+      //adjust the translations to account for the new location
+      translationX =point.getX()-(scale*p2.getX());
+      translationY =point.getY()-(scale*p2.getY());
 
       try {
          inverseTransform = transform.createInverse();
@@ -568,7 +573,7 @@ public final class TimelineTopComponent extends TopComponent implements GLEventL
 
       //Calc the bounding points for the data-space from the screen coordinates
       minPoint = getVirtualCoordinates(0, 0);
-      maxPoint = getVirtualCoordinates(getWidth(), getHeight());
+      maxPoint = getVirtualCoordinates(width, height);
    }
 
    /**
