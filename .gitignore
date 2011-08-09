@@ -41,3 +41,7 @@ Thumbs.db
 #####################
 .csv
 
+/neuroshareUtils/nbproject/private/
+/workspace/nbproject/private/
+/model/nbproject/private/
+/explorerEditor/nbproject/private/

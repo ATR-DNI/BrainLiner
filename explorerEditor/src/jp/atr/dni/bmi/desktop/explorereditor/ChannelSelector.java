@@ -10,6 +10,7 @@ import java.awt.Dialog;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
+import java.util.Date;
 import javax.swing.DefaultListModel;
 import javax.swing.JOptionPane;
 
@@ -510,7 +511,7 @@ public class ChannelSelector extends javax.swing.JPanel implements ActionListene
     private void afterInitComponents() {
         // Set values about components.
         this.dialogDescriptor = new DialogDescriptor(this, "Channel Selecter", true, this);
-        // Case : Neuroshare(nsn), Plexon(plx), BlackRockMicroSystems(nev,ns1-9)
+        // Case : Neuroshare(nsn), Plexon(plx), BlackRockMicroSystems(nev,ns1-9), ATRCSV(csv)
         FileType fileType = this.generalFileInfo.getFileType();
         if (FileType.isDataFile(fileType)) {
             this.dataFileFlag = true;
@@ -521,7 +522,7 @@ public class ChannelSelector extends javax.swing.JPanel implements ActionListene
                 if (fileType == FileType.NSN) {
                     // Get nsObj if unload.
                     NSReader nsr = new NSReader();
-                    nsf = nsr.readNSFileOnlyInfo(this.generalFileInfo.getFilePath());
+                    nsf = nsr.readNSFileOnlyInfoOnlyOneSegSourceInfo(this.generalFileInfo.getFilePath());
                     this.generalFileInfo.setNsObj(nsf);
                 }
 //                } else if (fileType == FileType.PLX) {

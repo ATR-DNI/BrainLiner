@@ -757,8 +757,8 @@ public class ExplorerNode extends AbstractNode {
 
                             // Create Sheet.
                             Sheet.Set sourceGrp = Sheet.createPropertiesSet();
-                            sourceGrp.setDisplayName("Source No : " + (jj + 1) + " : ProbeInfo [" + ss.getProbeInfo() + "]");
-                            sourceGrp.setName("neuroshareEntity" + ":" + jj); // need to be identified.
+                            sourceGrp.setDisplayName("Entity No : " + (ii + 1) + " : Source No : " + (jj + 1) + " : ProbeInfo [" + ss.getProbeInfo() + "]");
+                            sourceGrp.setName("neuroshareEntity" + ":" + ii + ":" + jj); // need to be identified.
                             sourceGrp.setValue("tabName", "Neuroshare");
 
                             PropertySupport.Reflection si_MinValProp = new PropertySupport.Reflection(ss, double.class, "minVal");
