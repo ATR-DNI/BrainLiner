@@ -72,7 +72,7 @@ public class ExplorerNode extends AbstractNode {
      */
     public ExplorerNode() {
         super(new ExplorerChildren());
-        setDisplayName("Root of Data");
+        //setDisplayName("Root of Data");
         setIconBaseWithExtension("jp/atr/dni/bmi/desktop/explorereditor/monitor16.png");
     }
 
@@ -88,6 +88,11 @@ public class ExplorerNode extends AbstractNode {
         } else {
             return null;
         }
+    }
+
+    @Override
+    public boolean canDestroy() {
+        return true;
     }
 
     /**
@@ -739,13 +744,13 @@ public class ExplorerNode extends AbstractNode {
 
                     ArrayList<SegmentSourceInfo> segSourceInfos = segmentInfo.getSegSourceInfos();
                     if (segSourceInfos != null) {
-                        
+
                         // Display Count Limitation to save memory.
                         int displayCountLimit = segSourceInfos.size();
-                        if(displayCountLimit > 10){
+                        if (displayCountLimit > 10) {
                             displayCountLimit = 10;
                         }
-                        
+
                         for (int jj = 0; jj < displayCountLimit; jj++) {
 //                        for (int jj = 0; jj < segSourceInfos.size(); jj++) {
                             SegmentSourceInfo ss = segSourceInfos.get(jj);
@@ -886,6 +891,9 @@ public class ExplorerNode extends AbstractNode {
             //setName to refresh obj's value.
             setName(obj.getFileName());
 
+            // Reload.
+            ReloadAction ra = new ReloadAction();
+            ra.actionPerformed(e);
 
         }
 
@@ -913,17 +921,14 @@ public class ExplorerNode extends AbstractNode {
                 return;
             }
 
-
             if (obj.getFileType() == FileType.DIRECTORY) {
                 // Reload Directory.
                 setChildren(new ExplorerChildren(obj));
 
-            } else if (obj.getFileType() != FileType.UNKNOWN) {
+            } else {
                 // Reload File.
-                GeneralFileInfo tempFile = new GeneralFileInfo(obj.getFilePath());
-                obj.setModifiedTime(tempFile.getModifiedTime());
-                obj.setFileSize(tempFile.getFileSize());
-                setName(tempFile.getFileName());
+                ExplorerNode en = (ExplorerNode) getParentNode();
+                en.setChildren(new ExplorerChildren(new GeneralFileInfo(new File(obj.getFilePath()).getParent())));
             }
         }
 
@@ -972,6 +977,11 @@ public class ExplorerNode extends AbstractNode {
                     Exceptions.printStackTrace(ex);
                 }
             }
+
+            // Reload.
+            ReloadAction ra = new ReloadAction();
+            ra.actionPerformed(e);
+
         }
 
         @Override
@@ -1015,9 +1025,9 @@ public class ExplorerNode extends AbstractNode {
                         Exceptions.printStackTrace(ex);
                     }
                 }
-
-                // Reset nodes.
-                setChildren(new ExplorerChildren(obj));
+                // Reload.
+                ReloadAction ra = new ReloadAction();
+                ra.actionPerformed(e);
             }
         }
 
@@ -1064,31 +1074,30 @@ public class ExplorerNode extends AbstractNode {
             }
 
             if (gfi.getFileType() == FileType.PLX) {
-                JOptionPane.showMessageDialog(null, "Notice : It takes several minutes.\n Press OK, then please wait!");
+                JOptionPane.showMessageDialog(null, "Notice: File conversion can take several minutes depending on the file structure and size,\nduring which time you will not be able to use this software (the screen will simple become gray).\nPlease be patient during this time (files that are more than 100 Mb can take half an hour or longer to convert, depending on the structure).\n\nPress OK and then please patiently wait!");
                 NeuroshareFile nsf = new PlxReader().readPlxFileAllData(gfi.getFilePath());
                 NsnFileModelConverter.ModelConvert(nsf, tempFile.getAbsolutePath());
-                JOptionPane.showMessageDialog(null, "Convertion Done.\n");
+                JOptionPane.showMessageDialog(null, "Conversion Done.\n");
             } else if (gfi.getFileType() == FileType.NEV) {
-                JOptionPane.showMessageDialog(null, "Notice : It takes several minutes.\n Press OK, then please wait!");
+                JOptionPane.showMessageDialog(null, "Notice: File conversion can take several minutes depending on the file structure and size,\nduring which time you will not be able to use this software (the screen will simple become gray).\nPlease be patient during this time (files that are more than 100 Mb can take half an hour or longer to convert, depending on the structure).\n\nPress OK and then please patiently wait!");
                 NeuroshareFile nsf = new NevReader().readNevFileAllData(gfi.getFilePath());
                 NsnFileModelConverter.ModelConvert(nsf, tempFile.getAbsolutePath());
-                JOptionPane.showMessageDialog(null, "Convertion Done.\n");
+                JOptionPane.showMessageDialog(null, "Conversion Done.\n");
             } else if (gfi.getFileType() == FileType.NSX) {
-                JOptionPane.showMessageDialog(null, "Notice : It takes several minutes.\n Press OK, then please wait!");
+                JOptionPane.showMessageDialog(null, "Notice: File conversion can take several minutes depending on the file structure and size,\nduring which time you will not be able to use this software (the screen will simple become gray).\nPlease be patient during this time (files that are more than 100 Mb can take half an hour or longer to convert, depending on the structure).\n\nPress OK and then please patiently wait!");
                 NeuroshareFile nsf = new NSXReader().readNsxFileAllData(gfi.getFilePath());
                 NsnFileModelConverter.ModelConvert(nsf, tempFile.getAbsolutePath());
-                JOptionPane.showMessageDialog(null, "Convertion Done.\n");
+                JOptionPane.showMessageDialog(null, "Conversion Done.\n");
             } else if (gfi.getFileType() == FileType.CSV) {
-                JOptionPane.showMessageDialog(null, "Notice : It takes several minutes.\n Press OK, then please wait!");
+                JOptionPane.showMessageDialog(null, "Notice: File conversion can take several minutes depending on the file structure and size,\nduring which time you will not be able to use this software (the screen will simple become gray).\nPlease be patient during this time (files that are more than 100 Mb can take half an hour or longer to convert, depending on the structure).\n\nPress OK and then please patiently wait!");
                 NeuroshareFile nsf = new CSVReader().readCsvFileAllData(gfi.getFilePath());
                 NsnFileModelConverter.ModelConvert(nsf, tempFile.getAbsolutePath());
-                JOptionPane.showMessageDialog(null, "Convertion Done.\n");
+                JOptionPane.showMessageDialog(null, "Conversion Done.\n");
             }
 
-            // Reset nodes.
-            GeneralFileInfo parent = new GeneralFileInfo((new File(obj.getFilePath()).getParent()));
-            setChildren(new ExplorerChildren(parent));
-
+            // Reload.
+            ReloadAction ra = new ReloadAction();
+            ra.actionPerformed(e);
 
         }
 
@@ -1124,6 +1133,10 @@ public class ExplorerNode extends AbstractNode {
             // Open ChannelSelecter Dialog.
             ChannelSelector cs = new ChannelSelector(obj);
             cs.showDialog();
+
+            // Reload.
+            ReloadAction ra = new ReloadAction();
+            ra.actionPerformed(e);
 
         }
 
