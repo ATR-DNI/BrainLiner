@@ -487,7 +487,7 @@ public class ChannelSelector extends javax.swing.JPanel implements ActionListene
                         segChannel.setSourceCount(1);
                         ch = (Channel) segChannel;
 
-                        JOptionPane.showMessageDialog(null, "Channel: " + ch.getLabel() + " - Extra ns_SegSourceInfos were skipped!");
+                        JOptionPane.showMessageDialog(null, "Channel: " + ch.getLabel() + " - This channel contains multiple ns_SegSourceInfos.\nOnly the first ns_SegSourceInfo was saved and the rest were skipped.");
                     }
                 }
                 channels[i] = ch;
