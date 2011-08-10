@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<module codename="jp.atr.dni.bmi.desktop.workingfileutils">
+    <module_version install_time="1312954272354" last="true" origin="installer" specification_version="1.0">
+        <file crc="2269953460" name="config/Modules/jp-atr-dni-bmi-desktop-workingfileutils.xml"/>
+        <file crc="2979339064" name="modules/jp-atr-dni-bmi-desktop-workingfileutils.jar"/>
+    </module_version>
+</module>
