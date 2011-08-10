@@ -23,7 +23,11 @@ public final class EventChannel implements Channel<NSNEventData> {
    public EventChannel(int id, EventInfo nsnEntity) {
       this.id = id;
       this.nsnEntity = nsnEntity;
-      data = new NSNEventData(nsnEntity);
+      this.data = null;
+   }
+   
+   private void initialize(){
+       this.data = new NSNEventData(nsnEntity);
    }
 
    @Override
@@ -68,7 +72,10 @@ public final class EventChannel implements Channel<NSNEventData> {
 
    @Override
    public NSNEventData getData() {
-      return data;
+       if(this.data == null){
+           initialize();
+       }
+       return data;
    }
 
    /**

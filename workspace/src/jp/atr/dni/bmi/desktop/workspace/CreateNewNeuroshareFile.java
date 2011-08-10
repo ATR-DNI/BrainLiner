@@ -1,6 +1,7 @@
 package jp.atr.dni.bmi.desktop.workspace;
 
 import java.util.ArrayList;
+import javax.swing.JOptionPane;
 import jp.atr.dni.bmi.desktop.model.api.data.APIList;
 import jp.atr.dni.bmi.desktop.model.api.AnalogChannel;
 
@@ -391,12 +392,14 @@ public class CreateNewNeuroshareFile {
                 nsNED.closeDataFile();
             }
         }
-// Close and create.
-        int rtnval7 = nsFile.closeFile();
 
-        if (rtnval7
-                != 0) {
+        // Close and create.
+        int rtnval7 = nsFile.closeFile();
+        if (rtnval7 != 0) {
             // close error.
         }
+        
+        // Show Message.
+        JOptionPane.showMessageDialog(null, "Export was done.");
     }
 }

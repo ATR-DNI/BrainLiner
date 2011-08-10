@@ -16,16 +16,23 @@ public final class AnalogChannel implements Channel<NSNAnalogData> {
 
    private int id;
    private final AnalogInfo nsnEntity;
-   private final NSNAnalogData data;
+   private NSNAnalogData data;
 
    public AnalogChannel(int id, AnalogInfo nsnEntity) {
       this.id = id;
       this.nsnEntity = nsnEntity;
-      data = new NSNAnalogData(nsnEntity);
+      this.data = null;
+   }
+   
+   private void initialize(){
+       this.data = new NSNAnalogData(nsnEntity);
    }
 
    @Override
    public NSNAnalogData getData() {
+       if(this.data == null){
+           initialize();
+       }
       return data;
    }
 

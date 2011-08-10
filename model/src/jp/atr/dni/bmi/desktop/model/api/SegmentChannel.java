@@ -21,13 +21,17 @@ public final class SegmentChannel implements Channel<NSNSegmentData> {
     public SegmentChannel(int id, SegmentInfo nsnEntity) {
         this.id = id;
         this.nsnEntity = nsnEntity;
-        data = new NSNSegmentData(nsnEntity);
+        this.data = null;
 
         if (nsnEntity.getSourceCount() > 0) {
             for (int i = 0; i < nsnEntity.getSegSourceInfos().size(); i++) {
                 segmentSources.add(nsnEntity.getSegSourceInfos().get(i));
             }
         }
+    }
+    
+    private void initialize(){
+        this.data = new NSNSegmentData(nsnEntity);
     }
 
     @Override
@@ -69,6 +73,9 @@ public final class SegmentChannel implements Channel<NSNSegmentData> {
 
     @Override
     public NSNSegmentData getData() {
+        if(this.data == null){
+            initialize();
+        }
         return data;
     }
 
