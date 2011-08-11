@@ -24,8 +24,8 @@ public class NSNSegmentData {
 
     private String intermediateFileNameForInfo;
     private String intermediateFileNameForData;
+    private String intermediateFileNameForSourceInfo;
     private int segmentID = 0;
-    private ArrayList<String> intermediateFileNameForSourceInfo = null;
     private NSNTagElement tagElement;
     private NSNEntityInfo entityInfo;
     private NSNSegmentInfo segmentInfo;
@@ -41,6 +41,8 @@ public class NSNSegmentData {
 
         this.intermediateFileNameForInfo = ConstantValues.FN_HEADER + ConstantValues.SEGMENT
                 + "_" + ID + ".segmentInfo";
+        this.intermediateFileNameForSourceInfo = ConstantValues.FN_HEADER + ConstantValues.SEGMENT
+                + "_" + ID + ".segmentSourceInfo";
         this.intermediateFileNameForData = ConstantValues.FN_HEADER + ConstantValues.SEGMENT
                 + "_" + ID + ".segmentData";
         this.segmentID = ID;
@@ -49,6 +51,7 @@ public class NSNSegmentData {
         this.tagElement.addDwElemLength(40); // Byte Num of ns_ENTITYINFO
         this.segmentInfo = new NSNSegmentInfo();
         this.tagElement.addDwElemLength(52); // Byte Num of ns_SEGMENTINFO
+        this.segSourceInfos = new ArrayList<NSNSegSourceInfo>();
         this.dataFileFOS = null;
         this.dataFileDOS = null;
     }
@@ -134,22 +137,12 @@ public class NSNSegmentData {
                 this.segmentInfo.setDwMinSampleCount(dwSampleCount);
             }
 
-            // Create ns_SEGSOURCEINFO if first call.
-            if (segSourceInfos == null) {
-                segSourceInfos = new ArrayList<NSNSegSourceInfo>();
-                intermediateFileNameForSourceInfo = new ArrayList<String>();
-            }
-
             // Add ns_SegSourceInfo
             segSourceInfos.add(new NSNSegSourceInfo());
 
             // segSourceID : identification num of ns_SEGSOURCEINFO. [ 0,1,2... ]
             segSourceID = segSourceInfos.size() - 1;
 
-            // Define intermediate FILE name for ns_SEGSOURCEINFO.
-            this.getIntermediateFileNameForSourceInfo().add(ConstantValues.FN_HEADER
-                    + ConstantValues.SEGMENT + "_" + this.segmentID + "_" + segSourceID
-                    + ".segSourceInfo");
             this.tagElement.addDwElemLength(248); // Byte Num of ns_SEGSOURCEINFO
             this.segmentInfo.addDwSourceCount(1); // Byte Num of ns_SEGSOURCEINFO
 
@@ -226,11 +219,6 @@ public class NSNSegmentData {
             if (this.segmentInfo.getDwMinSampleCount() > dwSampleCount) {
                 this.segmentInfo.setDwMinSampleCount(dwSampleCount);
             }
-            // Create ns_SEGSOURCEINFO if first call.
-            if (segSourceInfos == null) {
-                segSourceInfos = new ArrayList<NSNSegSourceInfo>();
-                intermediateFileNameForSourceInfo = new ArrayList<String>();
-            }
 
             // Add ns_SegSourceInfo (ONLY FIRST CALL!!!)
             if (segSourceInfos.isEmpty()) {
@@ -240,10 +228,6 @@ public class NSNSegmentData {
                 // segSourceID : identification num of ns_SEGSOURCEINFO. [ 0,1,2... ]
                 segSourceID = segSourceInfos.size() - 1;
 
-                // Define intermediate FILE name for ns_SEGSOURCEINFO.
-                this.getIntermediateFileNameForSourceInfo().add(ConstantValues.FN_HEADER
-                        + ConstantValues.SEGMENT + "_" + this.segmentID + "_" + segSourceID
-                        + ".segSourceInfo");
                 this.tagElement.addDwElemLength(248); // Byte Num of ns_SEGSOURCEINFO
                 this.segmentInfo.addDwSourceCount(1); // Byte Num of ns_SEGSOURCEINFO
 
@@ -376,7 +360,7 @@ public class NSNSegmentData {
         try {
 
             // Open the intermediatefile. (use FileOutputStream, DataOutputStream.)
-            tempFile = new File(this.getIntermediateFileNameForSourceInfo().get(segSourceID));
+            tempFile = new File(this.getIntermediateFileNameForSourceInfo());
             fos = new FileOutputStream(tempFile, true);
             dos = new DataOutputStream(fos);
 
@@ -505,7 +489,7 @@ public class NSNSegmentData {
     }
 
     /**
-     * @param segSourceInfo the segSourceInfo to set
+     * @param segSourceInfos the segSourceInfo to set
      */
     public void setSegSourceInfos(ArrayList<NSNSegSourceInfo> segSourceInfos) {
         this.segSourceInfos = segSourceInfos;
@@ -514,14 +498,14 @@ public class NSNSegmentData {
     /**
      * @return the intermediateFileNameForSourceInfo
      */
-    public ArrayList<String> getIntermediateFileNameForSourceInfo() {
+    public String getIntermediateFileNameForSourceInfo() {
         return intermediateFileNameForSourceInfo;
     }
 
     /**
      * @param intermediateFileNameForSourceInfo the intermediateFileNameForSourceInfo to set
      */
-    public void setIntermediateFileNameForSourceInfo(ArrayList<String> intermediateFileNameForSourceInfo) {
+    public void setIntermediateFileNameForSourceInfo(String intermediateFileNameForSourceInfo) {
         this.intermediateFileNameForSourceInfo = intermediateFileNameForSourceInfo;
     }
 

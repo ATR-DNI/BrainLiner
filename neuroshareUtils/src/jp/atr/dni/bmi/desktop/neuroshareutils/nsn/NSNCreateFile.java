@@ -335,19 +335,24 @@ public class NSNCreateFile {
                return ConstantValues.NS_FILEERROR;
             }
             // Check existence of the intermediate FILE.
+            File sf = new File(this.segmentData.get(jj).getIntermediateFileNameForSourceInfo());
+            if (!sf.exists()) {
+               continue;
+            }
+            // Integrate the intermediate FILE. (INFO : ns_TAGELEMENT, ns_ENTITYINFO,
+            // ns_SEGMENTINFO)
+            if (ConstantValues.NS_OK != FileCat(this.outputFileName,
+                    (this.segmentData.get(jj)).getIntermediateFileNameForSourceInfo())) {
+               return ConstantValues.NS_FILEERROR;
+            }
+            // Delete the intermediate FILE.
+            if (!(new File(this.segmentData.get(jj).getIntermediateFileNameForSourceInfo()).delete())) {
+               return ConstantValues.NS_FILEERROR;
+            }
+            // Check existence of the intermediate FILE.
             File tf = new File(this.segmentData.get(jj).getIntermediateFileNameForData());
             if (!tf.exists()) {
                continue;
-            }
-            // Integrate and Delete intermediate files. (INFO : ns_SEGSOURCEINFO * num of segSourceInfo)
-            for (int kk = 0; kk < this.segmentData.get(jj).getSegSourceInfos().size(); kk++) {
-               if (ConstantValues.NS_OK != FileCat(this.outputFileName,
-                       (this.segmentData.get(jj)).getIntermediateFileNameForSourceInfo().get(kk))) {
-                  return ConstantValues.NS_FILEERROR;
-               }
-               if (!(new File(this.segmentData.get(jj).getIntermediateFileNameForSourceInfo().get(kk)).delete())) {
-                  return ConstantValues.NS_FILEERROR;
-               }
             }
             // Integrate the intermediate FILE. (DATA : AnalogData)
             if (ConstantValues.NS_OK != FileCat(this.outputFileName,

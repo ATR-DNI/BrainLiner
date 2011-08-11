@@ -33,6 +33,7 @@ import jp.atr.dni.bmi.desktop.neuroshareutils.readers.NevReader;
 import jp.atr.dni.bmi.desktop.neuroshareutils.readers.PlxReader;
 import org.apache.commons.io.FileUtils;
 import org.openide.ErrorManager;
+import org.openide.explorer.propertysheet.PropertyPanel;
 import org.openide.nodes.AbstractNode;
 import org.openide.nodes.PropertySupport;
 import org.openide.nodes.Sheet;

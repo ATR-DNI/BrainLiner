@@ -12,7 +12,7 @@ package jp.atr.dni.bmi.desktop.explorereditor;
 
 import org.openide.explorer.ExplorerManager;
 import org.openide.explorer.ExplorerUtils;
-import org.openide.explorer.view.TreeTableView;
+import org.openide.explorer.view.BeanTreeView;
 import org.openide.windows.TopComponent;
 
 /**
@@ -41,7 +41,8 @@ public class ExplorerEditor extends TopComponent implements ExplorerManager.Prov
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        TreeTableView btv = new TreeTableView(); btv.setRootVisible(false);
+        BeanTreeView btv = new BeanTreeView();
+        btv.setRootVisible(false);
         jScrollPane1 = btv;
 
         setLayout(new java.awt.BorderLayout());
