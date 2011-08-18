@@ -38,9 +38,15 @@ import org.netbeans.api.settings.ConvertAsProperties;
 import org.openide.util.Lookup;
 
 /**
- * Top component which displays something.
+ * The main window for the timeline module. This is a view class that displays what the user will see.
+ * 
+ *  @author Makoto Takemiya - [武宮 誠] <br />
+ * <i>ATR - [株式会社・国際電気通信基礎技術研究所]</i>
+ *
+ * @version 2011/08/18
+ * 
  */
-@ConvertAsProperties(dtd = "-//jp.atr.dni.bmi.desktop.timeline//timeline//EN",
+@ConvertAsProperties(dtd = "-//jp.atr.dni.brainliner.desktop.timeline//timeline//EN",
 autostore = false)
 public final class TimelineTopComponent extends TopComponent implements GLEventListener, PropertyChangeListener/*implements LookupListener */ {
 
@@ -545,7 +551,7 @@ public final class TimelineTopComponent extends TopComponent implements GLEventL
 
       double width = getWidth();
       double height = getHeight();
-      
+
       Point2D p2 = inverseTransform.transform(point, null);
 
 //      transform = new AffineTransform(1, 0, 0, 1, 0, 0);
@@ -561,10 +567,10 @@ public final class TimelineTopComponent extends TopComponent implements GLEventL
       transform.translate(point.getX(), point.getY());
       transform.scale(scale, scale);
       transform.translate(-p2.getX(), -p2.getY());
-      
+
       //adjust the translations to account for the new location
-      translationX =point.getX()-(scale*p2.getX());
-      translationY =point.getY()-(scale*p2.getY());
+      translationX = point.getX() - (scale * p2.getX());
+      translationY = point.getY() - (scale * p2.getY());
 
       try {
          inverseTransform = transform.createInverse();
