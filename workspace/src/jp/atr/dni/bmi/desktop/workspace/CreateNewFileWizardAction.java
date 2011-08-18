@@ -13,6 +13,7 @@ import jp.atr.dni.bmi.desktop.neuroshareutils.nsa.NSAFileInfo;
 import org.openide.DialogDisplayer;
 import org.openide.WizardDescriptor;
 import org.openide.util.HelpCtx;
+import org.openide.util.ImageUtilities;
 
 // An example action demonstrating how the wizard could be called from within
 // your code. You can copy-paste the code below wherever you need.
@@ -25,6 +26,7 @@ public final class CreateNewFileWizardAction implements ActionListener {
       // {0} will be replaced by WizardDesriptor.Panel.getComponent().getName()
       wizardDescriptor.setTitleFormat(new MessageFormat("{0}"));
       wizardDescriptor.setTitle("Create New File Wizard.");
+      wizardDescriptor.putProperty(WizardDescriptor.PROP_IMAGE, ImageUtilities.loadImage("jp/atr/dni/bmi/desktop/workspace/bmiDBLogoCurveBright.png", true));
       Dialog dialog = DialogDisplayer.getDefault().createDialog(wizardDescriptor);
       dialog.setVisible(true);
       dialog.toFront();
