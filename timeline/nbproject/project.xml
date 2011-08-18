@@ -3,8 +3,8 @@
     <type>org.netbeans.modules.apisupport.project</type>
     <configuration>
         <data xmlns="http://www.netbeans.org/ns/nb-module-project/3">
-            <code-name-base>jp.atr.dni.bmi.desktop.timeline</code-name-base>
-            <standalone/>
+            <code-name-base>jp.atr.dni.brainliner.desktop.timeline</code-name-base>
+            <suite-component/>
             <module-dependencies>
                 <dependency>
                     <code-name-base>jp.atr.dni.bmi.desktop.model</code-name-base>
@@ -20,15 +20,7 @@
                     <compile-dependency/>
                     <run-dependency>
                         <release-version>1</release-version>
-                        <specification-version>1.26.1</specification-version>
-                    </run-dependency>
-                </dependency>
-                <dependency>
-                    <code-name-base>org.openide.awt</code-name-base>
-                    <build-prerequisite/>
-                    <compile-dependency/>
-                    <run-dependency>
-                        <specification-version>7.23.1</specification-version>
+                        <specification-version>1.31.1</specification-version>
                     </run-dependency>
                 </dependency>
                 <dependency>
@@ -36,7 +28,7 @@
                     <build-prerequisite/>
                     <compile-dependency/>
                     <run-dependency>
-                        <specification-version>8.6.2</specification-version>
+                        <specification-version>8.15.1</specification-version>
                     </run-dependency>
                 </dependency>
                 <dependency>
@@ -44,7 +36,7 @@
                     <build-prerequisite/>
                     <compile-dependency/>
                     <run-dependency>
-                        <specification-version>8.3.1</specification-version>
+                        <specification-version>8.8.1</specification-version>
                     </run-dependency>
                 </dependency>
                 <dependency>
@@ -52,7 +44,7 @@
                     <build-prerequisite/>
                     <compile-dependency/>
                     <run-dependency>
-                        <specification-version>6.33.1</specification-version>
+                        <specification-version>6.40.1</specification-version>
                     </run-dependency>
                 </dependency>
             </module-dependencies>
@@ -72,10 +64,6 @@
             <class-path-extension>
                 <runtime-relative-path>ext/gluegen-gl.jar</runtime-relative-path>
                 <binary-origin>release/modules/ext/gluegen-gl.jar</binary-origin>
-            </class-path-extension>
-            <class-path-extension>
-                <runtime-relative-path>ext/newt.all.jar</runtime-relative-path>
-                <binary-origin>release/modules/ext/newt.all.jar</binary-origin>
             </class-path-extension>
         </data>
     </configuration>
