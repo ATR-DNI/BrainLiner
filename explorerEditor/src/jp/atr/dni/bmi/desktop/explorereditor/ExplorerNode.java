@@ -1113,7 +1113,7 @@ public class ExplorerNode extends AbstractNode {
     private class CopyToWorkspaceAction extends AbstractAction implements Presenter.Popup {
 
         public CopyToWorkspaceAction() {
-            putValue(NAME, "Copy To Workspace");
+            putValue(NAME, "Copy to Workspace");
         }
 
         @Override
