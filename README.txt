@@ -8,6 +8,6 @@ Please let us know if you find any bugs or want to request any features! Contact
 
 This software is licensed with the Creative Commons Attribution license (http://creativecommons.org/licenses/by/3.0/). The statutes in the legalized version apply (http://creativecommons.org/licenses/by/3.0/legalcode). By using our software, you consent to agree to the terms of this license.
 
-If you wish to change or redistribute the source or binary executables, please include the following citation:
+If you wish to change or redistribute the source or binary executables, please include the following citation (link: http://www.frontiersin.org/10.3389/conf.fnins.2010.13.00129/event_abstract):
 
 Takemiya M, Murata S and Kamitani Y (2010). A Web Portal and Search Engine to Promote Collaboration in Brain-Machine Interface Research. Front. Neurosci. Conference Abstract: Neuroinformatics 2010 . doi: 10.3389/conf.fnins.2010.13.00129
