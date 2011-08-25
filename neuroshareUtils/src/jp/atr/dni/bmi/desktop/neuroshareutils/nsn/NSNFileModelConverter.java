@@ -307,60 +307,85 @@ public class NSNFileModelConverter {
                     // Open the data file. 
                     nsSD.openDataFile();
 
-                    // Add Segment Data
-                    // If you want to add multiple rows data, repeat to call add***Data.
-                    // Be care! segSourceID is returned!!
-                    // int segSourceID = nsSD.addSegmentData(dTimestamp_segment, dwUnitID_segment,
-                    // dValue_segment);
-                    for (int kk = 0; kk < value.size(); kk++) {
+                    if (segmentInfo.getSourceCount() != 0 && segmentInfo.getSourceCount() == segmentInfo.getEntityInfo().getItemCount()) {
 
-                        double[] segmentValue = new double[(int) value.get(kk).size()];
-                        for (int ll = 0; ll < (int) value.get(kk).size(); ll++) {
-                            segmentValue[ll] = (double) value.get(kk).get(ll);
-                        }
+                        // Add Segment Data
+                        // If you want to add multiple rows data, repeat to call add***Data.
+                        // Be care! segSourceID is returned!!
                         // int segSourceID = nsSD.addSegmentData(dTimestamp_segment, dwUnitID_segment,
                         // dValue_segment);
-                        int segSourceID = nsSD.addSegmentData((double) timestampData.get(kk),
-                                (int) ((long) unitIDData.get(kk)), segmentValue);
-                        if (segSourceID < 0) {
-                            // add error. - input arg error - or intermediate file i/o error.
+                        for (int kk = 0; kk < value.size(); kk++) {
+
+                            double[] segmentValue = new double[(int) value.get(kk).size()];
+                            for (int ll = 0; ll < (int) value.get(kk).size(); ll++) {
+                                segmentValue[ll] = (double) value.get(kk).get(ll);
+                            }
+                            // int segSourceID = nsSD.addSegmentData(dTimestamp_segment, dwUnitID_segment,
+                            // dValue_segment);
+                            int segSourceID = nsSD.addSegmentData((double) timestampData.get(kk),
+                                    (int) ((long) unitIDData.get(kk)), segmentValue);
+                            if (segSourceID < 0) {
+                                // add error. - input arg error - or intermediate file i/o error.
+                            }
+
+                            // Modify ns_SEGSOURCEINFO.
+                            // Get it.
+                            // Be care! segSourceID is needed!!!
+                            NSASegSourceInfo nsaSegSourceInfo = nsSD.getSegSourceInfo(segSourceID);
+                            if (nsaSegSourceInfo == null) {
+                                // Get SegmentInfo error - input args error.
+                            }
+
+                            // Modify members.
+                            nsaSegSourceInfo.setDResolution(segmentInfo.getSegSourceInfos().get(kk).getResolution());
+                            // nsaSegSourceInfo.setDMinVal(3.0); // [Can Edit, ***But not recommend to modify
+                            // this.***]
+                            // but it WAS updated by addSegmentData
+                            // nsaSegSourceInfo.setDMaxVal(5); // [Can Edit, ***But not recommend to modify
+                            // this.***]
+                            // but it WAS updated by addSegmentData
+                            nsaSegSourceInfo.setDSubSampleShift(segmentInfo.getSegSourceInfos().get(kk).getSubSampleShift());
+                            nsaSegSourceInfo.setDLocationX(segmentInfo.getSegSourceInfos().get(kk).getLocationX());
+                            nsaSegSourceInfo.setDLocationY(segmentInfo.getSegSourceInfos().get(kk).getLocationY());
+                            nsaSegSourceInfo.setDLocationZ(segmentInfo.getSegSourceInfos().get(kk).getLocationZ());
+                            nsaSegSourceInfo.setDLocationUser(segmentInfo.getSegSourceInfos().get(kk).getLocationUser());
+                            nsaSegSourceInfo.setDHighFreqCorner(segmentInfo.getSegSourceInfos().get(kk).getHighFreqCorner());
+                            nsaSegSourceInfo.setDwHighFreqOrder((int) segmentInfo.getSegSourceInfos().get(kk).getHighFreqOrder());
+                            nsaSegSourceInfo.setSzHighFilterType(segmentInfo.getSegSourceInfos().get(kk).getHighFilterType());
+                            nsaSegSourceInfo.setDLowFreqCorner(segmentInfo.getSegSourceInfos().get(kk).getLowFreqCorner());
+                            nsaSegSourceInfo.setDwLowFreqOrder((int) segmentInfo.getSegSourceInfos().get(kk).getLowFreqOrder());
+                            nsaSegSourceInfo.setSzLowFilterType(segmentInfo.getSegSourceInfos().get(kk).getLowFilterType());
+                            nsaSegSourceInfo.setSzProbeInfo(segmentInfo.getSegSourceInfos().get(kk).getProbeInfo());
+
+                            // Set it.
+                            // Be care! segSourceID is needed!!!
+                            int rtnval11 = nsSD.setSegSourceInfo(segSourceID, nsaSegSourceInfo);
+                            if (rtnval11 != 0) {
+                                // set Error. - nsaSegmentInfo includes error
+                            }
+                        }
+                    } else {
+
+                        // Add Segment Data without Add SegmentSource
+                        // If you want to add multiple rows data, repeat to call add***Data.
+                        // Be care! segSourceID is returned!!
+                        // int segSourceID = nsSD.addSegmentData(dTimestamp_segment, dwUnitID_segment,
+                        // dValue_segment);
+                        for (int kk = 0; kk < value.size(); kk++) {
+
+                            double[] segmentValue = new double[(int) value.get(kk).size()];
+                            for (int ll = 0; ll < (int) value.get(kk).size(); ll++) {
+                                segmentValue[ll] = (double) value.get(kk).get(ll);
+                            }
+                            // int segSourceID = nsSD.addSegmentData(dTimestamp_segment, dwUnitID_segment,
+                            // dValue_segment);
+                            int segSourceID = nsSD.addSegmentDataWithoutAddingExtraSegSourceInfo((double) timestampData.get(kk),
+                                    (int) ((long) unitIDData.get(kk)), segmentValue);
+                            if (segSourceID < 0) {
+                                // add error. - input arg error - or intermediate file i/o error.
+                            }
                         }
 
-                        // Modify ns_SEGSOURCEINFO.
-                        // Get it.
-                        // Be care! segSourceID is needed!!!
-                        NSASegSourceInfo nsaSegSourceInfo = nsSD.getSegSourceInfo(segSourceID);
-                        if (nsaSegSourceInfo == null) {
-                            // Get SegmentInfo error - input args error.
-                        }
-
-                        // Modify members.
-                        nsaSegSourceInfo.setDResolution(segmentInfo.getSegSourceInfos().get(kk).getResolution());
-                        // nsaSegSourceInfo.setDMinVal(3.0); // [Can Edit, ***But not recommend to modify
-                        // this.***]
-                        // but it WAS updated by addSegmentData
-                        // nsaSegSourceInfo.setDMaxVal(5); // [Can Edit, ***But not recommend to modify
-                        // this.***]
-                        // but it WAS updated by addSegmentData
-                        nsaSegSourceInfo.setDSubSampleShift(segmentInfo.getSegSourceInfos().get(kk).getSubSampleShift());
-                        nsaSegSourceInfo.setDLocationX(segmentInfo.getSegSourceInfos().get(kk).getLocationX());
-                        nsaSegSourceInfo.setDLocationY(segmentInfo.getSegSourceInfos().get(kk).getLocationY());
-                        nsaSegSourceInfo.setDLocationZ(segmentInfo.getSegSourceInfos().get(kk).getLocationZ());
-                        nsaSegSourceInfo.setDLocationUser(segmentInfo.getSegSourceInfos().get(kk).getLocationUser());
-                        nsaSegSourceInfo.setDHighFreqCorner(segmentInfo.getSegSourceInfos().get(kk).getHighFreqCorner());
-                        nsaSegSourceInfo.setDwHighFreqOrder((int) segmentInfo.getSegSourceInfos().get(kk).getHighFreqOrder());
-                        nsaSegSourceInfo.setSzHighFilterType(segmentInfo.getSegSourceInfos().get(kk).getHighFilterType());
-                        nsaSegSourceInfo.setDLowFreqCorner(segmentInfo.getSegSourceInfos().get(kk).getLowFreqCorner());
-                        nsaSegSourceInfo.setDwLowFreqOrder((int) segmentInfo.getSegSourceInfos().get(kk).getLowFreqOrder());
-                        nsaSegSourceInfo.setSzLowFilterType(segmentInfo.getSegSourceInfos().get(kk).getLowFilterType());
-                        nsaSegSourceInfo.setSzProbeInfo(segmentInfo.getSegSourceInfos().get(kk).getProbeInfo());
-
-                        // Set it.
-                        // Be care! segSourceID is needed!!!
-                        int rtnval11 = nsSD.setSegSourceInfo(segSourceID, nsaSegSourceInfo);
-                        if (rtnval11 != 0) {
-                            // set Error. - nsaSegmentInfo includes error
-                        }
                     }
 
                     // Close the data file.

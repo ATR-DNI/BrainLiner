@@ -394,8 +394,8 @@ public class PlxReader {
                 // Segment
 
                 // Tag
-                // 92 : ns_ENTITYINFO + ns_SEGMENTINFO
-                Tag tagSegment = new Tag(EntityType.ENTITY_SEGMENT, ConstantValues.NS_ENTITYINFO_LENGTH + ConstantValues.NS_SEGMENTINFO_LENGTH);
+                // 340 : ns_ENTITYINFO + ns_SEGMENTINFO + ns_SEGSOURCEINFO
+                Tag tagSegment = new Tag(EntityType.ENTITY_SEGMENT, ConstantValues.NS_ENTITYINFO_LENGTH + ConstantValues.NS_SEGMENTINFO_LENGTH + ConstantValues.NS_SEGSOURCEINFO_LENGTH);
 
                 // EntityInfo
                 // 3 : SEGMENTENTITY, 0 : ItemCount
@@ -406,8 +406,15 @@ public class PlxReader {
                 SegmentInfo tempSegmentInfo = new SegmentInfo(tagSegment,
                         entityInfoSegment);
 
+                // Create tempSegmentSourceInfo for adding it to the target
+                // entity.
+                SegmentSourceInfo tempSegmentSourceInfo = new SegmentSourceInfo();
+                ArrayList<SegmentSourceInfo> tempSegSourceInfos = new ArrayList<SegmentSourceInfo>();
+                tempSegSourceInfos.add(tempSegmentSourceInfo);
+
+                tempSegmentInfo.setSegSourceInfos(tempSegSourceInfos);
+
                 // Modify members.
-                tempSegmentInfo.setSourceCount(0);
                 tempSegmentInfo.setMinSampleCount(numPointsWave);
                 tempSegmentInfo.setMinSampleCount(numPointsWave);
                 tempSegmentInfo.setSampleRate(aDFrequency);
@@ -789,9 +796,8 @@ public class PlxReader {
                         int segChannel = ((Integer) (((Short) channel).intValue() - 1)).shortValue();
                         SegmentInfo tempSegmentInfo = arraySegmentInfo.get(segChannel);
 
-                        // Create tempSegmentSourceInfo for adding it to the target
-                        // entity.
-                        SegmentSourceInfo tempSegmentSourceInfo = new SegmentSourceInfo();
+                        // Get tempSegmentSourceInfo.
+                        SegmentSourceInfo tempSegmentSourceInfo = tempSegmentInfo.getSegSourceInfos().get(0);
 
                         // Add Values to the target entity.
                         SegmentData segData = tempSegmentInfo.getSegData();
@@ -840,28 +846,26 @@ public class PlxReader {
                         double maxVal = tempArraySegDataForSort.get(tempArraySegDataForSort.size() - 1);
 
                         // Modify members of SegmentSourceInfo.
-                        tempSegmentSourceInfo.setMinVal(minVal);
-                        tempSegmentSourceInfo.setMaxVal(maxVal);
-                        tempSegmentSourceInfo.setResolution(0);
-                        tempSegmentSourceInfo.setSubSampleShift(0);
-                        tempSegmentSourceInfo.setLocationX(0);
-                        tempSegmentSourceInfo.setLocationY(0);
-                        tempSegmentSourceInfo.setLocationZ(0);
-                        tempSegmentSourceInfo.setLocationUser(0);
-                        tempSegmentSourceInfo.setHighFreqCorner(0);
-                        tempSegmentSourceInfo.setHighFreqOrder(0);
-                        tempSegmentSourceInfo.setHighFilterType("");
-                        tempSegmentSourceInfo.setLowFreqCorner(0);
-                        tempSegmentSourceInfo.setLowFreqOrder(0);
-                        tempSegmentSourceInfo.setLowFilterType("");
-                        tempSegmentSourceInfo.setProbeInfo("");
+                        if(tempSegmentSourceInfo.getMinVal() > minVal){
+                            tempSegmentSourceInfo.setMinVal(minVal);
+                        }
+                        if(tempSegmentSourceInfo.getMaxVal() < maxVal){
+                            tempSegmentSourceInfo.setMaxVal(maxVal);
+                        }
+                        // Modify members of SegmentInfo.
+                        if(tempSegmentInfo.getMinSampleCount() > numberOfWordsInWaveform){
+                            tempSegmentInfo.setMinSampleCount(numberOfWordsInWaveform);
+                        }
+                        if(tempSegmentInfo.getMaxSampleCount() < numberOfWordsInWaveform){
+                            tempSegmentInfo.setMaxSampleCount(numberOfWordsInWaveform);
+                        }
 
-                        // Add SegmentSourceInfo to the target entity.
+                        // Set SegmentSourceInfo to the target entity.
                         ArrayList<SegmentSourceInfo> segSourceInfos = tempSegmentInfo.getSegSourceInfos();
                         if (segSourceInfos == null) {
                             segSourceInfos = new ArrayList<SegmentSourceInfo>();
                         }
-                        segSourceInfos.add(tempSegmentSourceInfo);
+                        segSourceInfos.set(0,tempSegmentSourceInfo);
                         tempSegmentInfo.setSegSourceInfos(segSourceInfos);
 
                         // Modify members of EntityInfo.
