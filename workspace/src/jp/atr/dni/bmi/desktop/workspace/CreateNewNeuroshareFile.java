@@ -69,7 +69,7 @@ public class CreateNewNeuroshareFile {
 
                 // Event
                 // Create new Event Entity (input arg is ns_ENTITYINFO.szEntityLabel.)
-                jp.atr.dni.bmi.desktop.neuroshareutils.nsn.NSNEventData nsEd = nsFile.newEventData(channel.getLabel());
+                jp.atr.dni.bmi.desktop.neuroshareutils.nsn.NSNEventData nsEd = nsFile.newEventData(channel.getLabel(), channel.getEventType());
                 if (nsEd == null) {
                     // new Event error - input args error.
                 }
@@ -398,7 +398,7 @@ public class CreateNewNeuroshareFile {
         if (rtnval7 != 0) {
             // close error.
         }
-        
+
         // Show Message.
         JOptionPane.showMessageDialog(null, "Export was done.");
     }

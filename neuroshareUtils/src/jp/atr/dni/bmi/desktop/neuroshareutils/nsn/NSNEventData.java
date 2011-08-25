@@ -11,6 +11,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import javax.swing.JOptionPane;
 import jp.atr.dni.bmi.desktop.neuroshareutils.ConstantValues;
+import jp.atr.dni.bmi.desktop.neuroshareutils.EventType;
 
 /**
  *
@@ -30,8 +31,9 @@ public class NSNEventData {
     /**
      * @param ID
      * @param szEntityLabel
+     * @param eventType
      */
-    public NSNEventData(int ID, String szEntityLabel) {
+    public NSNEventData(int ID, String szEntityLabel, EventType eventType) {
 
         this.intermediateFileNameForInfo = ConstantValues.FN_HEADER + ConstantValues.EVENT
                 + "_" + ID + ".eventInfo";
@@ -40,7 +42,7 @@ public class NSNEventData {
         this.tagElement = new NSNTagElement(NSNEntityType.EVENT);
         this.entityInfo = new NSNEntityInfo(szEntityLabel, NSNEntityType.EVENT);
         this.tagElement.addDwElemLength(40); // Byte Num of ns_ENTITYINFO
-        this.eventInfo = new NSNEventInfo();
+        this.eventInfo = new NSNEventInfo(eventType);
         this.tagElement.addDwElemLength(140); // Byte Num of ns_EVENTINFO
         this.dataFileFOS = null;
         this.dataFileDOS = null;

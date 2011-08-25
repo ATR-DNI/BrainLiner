@@ -4,6 +4,7 @@
 package jp.atr.dni.bmi.desktop.neuroshareutils.nsn;
 
 import jp.atr.dni.bmi.desktop.neuroshareutils.ConstantValues;
+import jp.atr.dni.bmi.desktop.neuroshareutils.EventType;
 import jp.atr.dni.bmi.desktop.neuroshareutils.nsa.NSAEventInfo;
 
 /**
@@ -21,8 +22,17 @@ public class NSNEventInfo {
     /**
      *
      */
-    public NSNEventInfo() {
-        this.dwEventType = NSNEventType.TEXT.ordinal(); //This is dangerous. It is better to define the numerical value through a map or some other way
+//    public NSNEventInfo() {
+//        this.dwEventType = NSNEventType.TEXT.ordinal(); //This is dangerous. It is better to define the numerical value through a map or some other way
+//        this.dwMinDataLength = Integer.MAX_VALUE;
+//        this.dwMaxDataLength = 0;
+//    }
+    
+    /**
+     * @param eventType
+     */
+    public NSNEventInfo(EventType eventType) {
+        this.dwEventType = eventType.ordinal();
         this.dwMinDataLength = Integer.MAX_VALUE;
         this.dwMaxDataLength = 0;
     }

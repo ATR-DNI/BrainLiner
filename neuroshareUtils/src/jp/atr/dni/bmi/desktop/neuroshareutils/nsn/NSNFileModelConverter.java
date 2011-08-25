@@ -97,8 +97,12 @@ public class NSNFileModelConverter {
 
                 if (entityType == EntityType.ENTITY_EVENT) {
                     // Event
+
+                    EventInfo eventInfo = (EventInfo) nsObj.getEntities().get(i);
+                    EventType eventType = eventInfo.getEventType();
+
                     // Create new Event Entity (input arg is ns_ENTITYINFO.szEntityLabel.)
-                    NSNEventData nsEd = nsFile.newEventData(ei.getEntityLabel());
+                    NSNEventData nsEd = nsFile.newEventData(ei.getEntityLabel(), eventType);
                     if (nsEd == null) {
                         // new Event error - input args error.
                     }
@@ -109,8 +113,6 @@ public class NSNFileModelConverter {
                     if (nsaEventInfo == null) {
                         // Get EventInfo error - input args error.
                     }
-
-                    EventInfo eventInfo = (EventInfo) nsObj.getEntities().get(i);
 
                     // Modify members.
                     // [can not edit] dwEventType. ::: For consistency of data.
@@ -134,7 +136,6 @@ public class NSNFileModelConverter {
                     // int rtnval2 = nsEd.addEventData(dTimestamp, dData);
 
                     int rtnval2 = 0;
-                    EventType eventType = eventInfo.getEventType();
 
                     // Open the data file. 
                     nsEd.openDataFile();

@@ -1044,7 +1044,7 @@ public class ExplorerNode extends AbstractNode {
     private class ConvertToNeuroshareAction extends AbstractAction implements Presenter.Popup {
 
         public ConvertToNeuroshareAction() {
-            putValue(NAME, "Convert To Neuroshare");
+            putValue(NAME, "Convert to Neuroshare");
         }
 
         @Override

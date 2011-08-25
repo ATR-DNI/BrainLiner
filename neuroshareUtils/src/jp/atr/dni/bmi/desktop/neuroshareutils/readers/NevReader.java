@@ -497,7 +497,7 @@ public class NevReader {
 
                     Tag tempTagElement = tempEventInfo.getTag();
                     EntityInfo tempEntityInfo = tempEventInfo.getEntityInfo();
-                    tempTagElement.setElemLength(tempTagElement.getElemLength() + 8 + 4 + 2);
+                    tempTagElement.setElemLength(tempTagElement.getElemLength() + 8 + 4 + 4);
                     tempEntityInfo.setItemCount(tempEntityInfo.getItemCount() + 1);
 
                     tempEventInfo.setEntityInfo(tempEntityInfo);

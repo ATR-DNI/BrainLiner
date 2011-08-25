@@ -10,12 +10,15 @@ import java.util.Calendar;
 import java.util.Collections;
 import java.util.GregorianCalendar;
 import jp.atr.dni.bmi.desktop.neuroshareutils.AnalogData;
+import jp.atr.dni.bmi.desktop.neuroshareutils.AnalogInfo;
 import jp.atr.dni.bmi.desktop.neuroshareutils.ConstantValues;
+import jp.atr.dni.bmi.desktop.neuroshareutils.DWordEventData;
 import jp.atr.dni.bmi.desktop.neuroshareutils.Entity;
 import jp.atr.dni.bmi.desktop.neuroshareutils.EntityInfo;
 import jp.atr.dni.bmi.desktop.neuroshareutils.EntityType;
 import jp.atr.dni.bmi.desktop.neuroshareutils.EventData;
 import jp.atr.dni.bmi.desktop.neuroshareutils.EventInfo;
+import jp.atr.dni.bmi.desktop.neuroshareutils.EventType;
 import jp.atr.dni.bmi.desktop.neuroshareutils.FileInfo;
 import jp.atr.dni.bmi.desktop.neuroshareutils.NeuralInfo;
 import jp.atr.dni.bmi.desktop.neuroshareutils.NeuroshareFile;
@@ -67,6 +70,8 @@ public class PlxReader {
 
             ArrayList<Entity> allEntities = new ArrayList<Entity>();
 
+            ArrayList<EventInfo> arrayEventInfo = null;
+            ArrayList<AnalogInfo> arrayAnalogInfo = null;
             ArrayList<SegmentInfo> arraySegmentInfo = null;
             ArrayList<NeuralInfo> arrayNeuralInfo = null;
 
@@ -375,7 +380,7 @@ public class PlxReader {
                 tempSegmentInfo.setMinSampleCount(numPointsWave);
                 tempSegmentInfo.setSampleRate(waveformFreq);
                 tempSegmentInfo.setUnits(schName);
-                
+
                 // Add SegmentInfo to arraySegmentInfo
                 arraySegmentInfo.add(tempSegmentInfo);
 
@@ -387,7 +392,7 @@ public class PlxReader {
 
                 // Tag
                 // 176 : ns_ENTITYINFO + ns_NEURALINFO
-                Tag tagNeural = new Tag(EntityType.ENTITY_NEURAL, 176);
+                Tag tagNeural = new Tag(EntityType.ENTITY_NEURAL, ConstantValues.NS_ENTITYINFO_LENGTH + ConstantValues.NS_NEURALINFO_LENGTH);
 
                 // EntityInfo
                 // 4 : NEURALEVENTENTITY, 0 : ItemCount
@@ -413,6 +418,31 @@ public class PlxReader {
 
             // 1.3 Event Channel Header
             //System.out.println("*** 1.3 Event Channel Header ***");
+
+            // Create array if it is null.
+            if (arrayEventInfo == null) {
+                arrayEventInfo = new ArrayList<EventInfo>();
+            }
+
+            // Add First Event.
+            // Tag
+            // 180 : ns_ENTITYINFO + ns_EVENTINFO
+            Tag tagFirstEvent = new Tag(EntityType.ENTITY_EVENT, ConstantValues.NS_ENTITYINFO_LENGTH + ConstantValues.NS_EVENTINFO_LENGTH);
+
+            // EntityInfo
+            // 1 : EVENTENTITY, 0 : ItemCount
+            EntityInfo entityInfoFirstEvent = new EntityInfo("Start",
+                    EntityType.ENTITY_EVENT, 0);
+
+            // EventInfo
+            EventInfo tempFirstEventInfo = new EventInfo(tagFirstEvent, entityInfoFirstEvent, EventType.EVENT_DWORD, 4, 4, "");
+
+            // Add EventInfo to arrayEventInfo
+            arrayEventInfo.add(tempFirstEventInfo);
+
+            // Event
+            fileInfo.setEntityCount(fileInfo.getEntityCount() + 1);
+
             // Repeat numEventChannels times.
             for (int c = 0; c < numEventChannels; c++) {
 
@@ -445,10 +475,59 @@ public class PlxReader {
                     //System.out.println("Padding[" + d + "] : " + echPadding[d]);
                 }
 
+                // Event Channel is saved as Event Entity.
+
+                // Event
+                // Tag
+                // 180 : ns_ENTITYINFO + ns_EVENTINFO
+                Tag tagEvent = new Tag(EntityType.ENTITY_EVENT, ConstantValues.NS_ENTITYINFO_LENGTH + ConstantValues.NS_EVENTINFO_LENGTH);
+
+                // EntityInfo
+                // 1 : EVENTENTITY, 0 : ItemCount
+                EntityInfo entityInfoEvent = new EntityInfo(echName,
+                        EntityType.ENTITY_EVENT, 0);
+
+                // EventInfo
+                EventInfo tempEventInfo = new EventInfo(tagEvent, entityInfoEvent, EventType.EVENT_DWORD, 4, 4, "");
+
+                // Add EventInfo to arrayEventInfo
+                arrayEventInfo.add(tempEventInfo);
+
+                // Event
+                fileInfo.setEntityCount(fileInfo.getEntityCount() + 1);
+
             }
+
+            // Add End Event.
+            // Tag
+            // 180 : ns_ENTITYINFO + ns_EVENTINFO
+            Tag tagEndEvent = new Tag(EntityType.ENTITY_EVENT, ConstantValues.NS_ENTITYINFO_LENGTH + ConstantValues.NS_EVENTINFO_LENGTH);
+
+            // EntityInfo
+            // 1 : EVENTENTITY, 0 : ItemCount
+            EntityInfo entityInfoEndEvent = new EntityInfo("Stop",
+                    EntityType.ENTITY_EVENT, 0);
+
+            // EventInfo
+            EventInfo tempEndEventInfo = new EventInfo(tagEndEvent, entityInfoEndEvent, EventType.EVENT_DWORD, 4, 4, "");
+
+            // Add EventInfo to arrayEventInfo
+            arrayEventInfo.add(tempEndEventInfo);
+
+            // Event
+            fileInfo.setEntityCount(fileInfo.getEntityCount() + 1);
+
 
             // 1.4 Continuous Channel Header
             //System.out.println("*** 1.4 Continuous Channel Header ***");
+
+            // SlowChannelHeaderGain : use when calculate voltage.
+            ArrayList<Integer> slowChGain = new ArrayList<Integer>();
+            // SlowChannelHeaderPreAmpGain : use when calculate voltage.
+            ArrayList<Integer> slowChPreAmpGain = new ArrayList<Integer>();
+            // SlowChannelHeaderEnabled : use when add entities.
+            ArrayList<Boolean> slowChEnabled = new ArrayList<Boolean>();
+
             // Repeat numSlowChannels times.
             for (int c = 0; c < numSlowChannels; c++) {
 
@@ -472,14 +551,22 @@ public class PlxReader {
                 // Gain : skip
                 int cchGain = ReaderUtils.readInt(raf);
                 //System.out.println("Gain : " + cchGain);
+                slowChGain.add(cchGain);
 
                 // Enabled : skip
                 int cchEnabled = ReaderUtils.readInt(raf);
                 //System.out.println("Enabled : " + cchEnabled);
+                if (cchEnabled == 0) {
+                    slowChEnabled.add(Boolean.FALSE);
+
+                } else {
+                    slowChEnabled.add(Boolean.TRUE);
+                }
 
                 // PreAmpGain : skip
                 int cchPreAmpGain = ReaderUtils.readInt(raf);
                 //System.out.println("PreAmpGain : " + cchPreAmpGain);
+                slowChPreAmpGain.add(cchPreAmpGain);
 
                 // SpikeChannel : skip
                 int cchSpikeChannel = ReaderUtils.readInt(raf);
@@ -500,6 +587,51 @@ public class PlxReader {
                     cchPadding[d] = ReaderUtils.readInt(raf);
                     //System.out.println("Padding[" + d + "] : " + cchPadding[d]);
                 }
+
+                // Continuous A/D Channel is saved as Analog Entity.
+
+                // Analog
+                // Create array if it is null.
+                if (arrayAnalogInfo == null) {
+                    arrayAnalogInfo = new ArrayList<AnalogInfo>();
+                }
+
+                // Tag
+                // 304 : ns_ENTITYINFO + ns_ANALOGINFO
+                Tag tagAnalog = new Tag(EntityType.ENTITY_ANALOG, ConstantValues.NS_ENTITYINFO_LENGTH + ConstantValues.NS_ANALOGINFO_LENGTH);
+
+                // EntityInfo
+                // 2 : ANALOGENTITY, 0 : ItemCount
+                EntityInfo entityInfoAnalog = new EntityInfo(cchName,
+                        EntityType.ENTITY_ANALOG, 0);
+
+                // AnalogInfo
+                AnalogInfo tempAnalogInfo = new AnalogInfo(tagAnalog,
+                        entityInfoAnalog);
+
+                // Modify members.
+                tempAnalogInfo.setSampleRate(cchADFreq);
+                tempAnalogInfo.setMinVal(Double.MAX_VALUE);
+                tempAnalogInfo.setMaxVal(Double.MIN_VALUE);
+                tempAnalogInfo.setUnits("mV");
+                tempAnalogInfo.setResolution(0); // TODO : fix it.
+                tempAnalogInfo.setLocationX(0);
+                tempAnalogInfo.setLocationY(0);
+                tempAnalogInfo.setLocationZ(0);
+                tempAnalogInfo.setLocationUser(0);
+                tempAnalogInfo.setHighFreqCorner(170);
+                tempAnalogInfo.setHighFreqOrder(4);
+                tempAnalogInfo.setHighFilterType("Butterworth");
+                tempAnalogInfo.setLowFreqCorner(0.7);
+                tempAnalogInfo.setLowFreqOrder(2);
+                tempAnalogInfo.setLowFilterType("Q=2");
+                tempAnalogInfo.setProbeInfo(cchComment);
+
+                // Add AnalogInfo to arrayAnalogInfo
+                arrayAnalogInfo.add(tempAnalogInfo);
+
+                // Analog
+                fileInfo.setEntityCount(fileInfo.getEntityCount() + 1);
 
             }
 
@@ -561,26 +693,64 @@ public class PlxReader {
                         // Calculate voltage. (See
                         // PlexonDataFileStrutureDocumentation.pdf)
                         // Switch cases.
-                        switch (version) {
-                            case 101:
-                            case 102:
-                                dValue = (dValue * 3000)
-                                        / (2048 * chGain.get(channel) * 1000);
+
+                        switch (type) {
+                            case 1:
+                                // 1.5.1 Spike Data Blocks
+                                switch (version) {
+                                    case 100:
+                                    case 101:
+                                    case 102:
+                                        dValue = (dValue * 3000)
+                                                / (2048 * chGain.get(channel) * 1000);
+                                        break;
+                                    case 103:
+                                    case 104:
+                                        dValue = (dValue * spikeMaxMagnitudeMV)
+                                                / (0.5 * Math.pow(2, bitsPerSpikeSample)
+                                                * chGain.get(channel) * 1000);
+                                        break;
+                                    case 105:
+                                        dValue = (dValue * spikeMaxMagnitudeMV)
+                                                / (0.5 * Math.pow(2, bitsPerSpikeSample)
+                                                * chGain.get(channel) * spikePreAmpGain);
+                                        break;
+                                    default:
+                                        // Greater 105.
+                                        dValue = (dValue * spikeMaxMagnitudeMV)
+                                                / (0.5 * Math.pow(2, bitsPerSpikeSample)
+                                                * chGain.get(channel) * spikePreAmpGain);
+                                        break;
+                                }
+
                                 break;
-                            case 103:
-                            case 104:
-                                dValue = (dValue * spikeMaxMagnitudeMV)
-                                        / (0.5 * Math.pow(2, bitsPerSpikeSample)
-                                        * chGain.get(channel) * 1000);
-                                break;
-                            case 105:
-                                dValue = (dValue * spikeMaxMagnitudeMV)
-                                        / (0.5 * Math.pow(2, bitsPerSpikeSample)
-                                        * chGain.get(channel) * spikePreAmpGain);
-                                break;
-                            default:
+                            case 5:
+                                // 1.5.3 Continuous A/D Data Blocks
+                                switch (version) {
+                                    case 100:
+                                    case 101:
+                                        dValue = (dValue * 5000)
+                                                / (2048 * slowChGain.get(channel) * 1000);
+                                        break;
+                                    case 102:
+                                        dValue = (dValue * 5000)
+                                                / (2048 * slowChGain.get(channel) * slowChPreAmpGain.get(channel));
+                                        break;
+                                    case 103:
+                                        dValue = (dValue * slowMaxMagnitudeMV)
+                                                / (0.5 * Math.pow(2, bitsPerSlowSample)
+                                                * slowChGain.get(channel) * slowChPreAmpGain.get(channel));
+                                        break;
+                                    default:
+                                        // Greater 103.
+                                        dValue = (dValue * slowMaxMagnitudeMV)
+                                                / (0.5 * Math.pow(2, bitsPerSlowSample)
+                                                * slowChGain.get(channel) * slowChPreAmpGain.get(channel));
+                                        break;
+                                }
                                 break;
                         }
+
 
                         dWaveform.add(dValue);
                     }
@@ -675,7 +845,7 @@ public class PlxReader {
 
                         // Modify members of EntityInfo.
                         EntityInfo tempEntityInfo01 = tempSegmentInfo.getEntityInfo();
-                        tempEntityInfo01.setItemCount(tempEntityInfo01.getItemCount() + dWaveform.size());
+                        tempEntityInfo01.setItemCount(tempEntityInfo01.getItemCount() + 1);
                         tempEntityInfo01.setDataPosition(position);
                         tempEntityInfo01.setFilePath(plxFilePath);
 
@@ -719,10 +889,91 @@ public class PlxReader {
 
                         break;
                     case 4:
-                        // Ignore for now.
+                        // 1.5.2 Event Data Blocks
+                        // Event
+
+                        short value = channel;
+                        // if channel == 258 then First value.
+                        if (channel == 258) {
+                            channel = 0;
+                        }
+                        // if channel == 259 then End value.
+                        if (channel == 259) {
+                            channel = ((Integer) (arrayEventInfo.size() - 1)).shortValue();
+                        }
+
+                        // Get the target entity from the array.
+                        EventInfo tempEventInfo = arrayEventInfo.get(channel);
+
+                        // Add Values to the target entity.
+                        ArrayList<EventData> tempEventData = tempEventInfo.getData();
+                        if (tempEventData == null) {
+                            tempEventData = new ArrayList<EventData>();
+                        }
+                        DWordEventData a = new DWordEventData(dTimestamp, 4);
+                        a.setData(((Short)value).longValue());
+                        tempEventData.add(a);
+
+                        // Modify members of EntityInfo.
+                        EntityInfo tempEntityInfo04 = tempEventInfo.getEntityInfo();
+                        tempEntityInfo04.setItemCount(tempEntityInfo04.getItemCount() + 1);
+                        tempEntityInfo04.setDataPosition(position);
+                        tempEntityInfo04.setFilePath(plxFilePath);
+
+                        // Modify members of TagElement.
+                        Tag tempTagElement04 = tempEventInfo.getTag();
+                        tempTagElement04.setElemLength(tempTagElement04.getElemLength() + 8 + 4 + 4);
+                        tempEventInfo.setTag(tempTagElement04);
+
+                        tempEventInfo.setEntityInfo(tempEntityInfo04);
+                        tempEventInfo.setData(tempEventData);
+                        //tempEventInfo.setEventType(EventType.EVENT_DWORD);
+                        //tempEventInfo.setMaxDataLength(4);
+                        //tempEventInfo.setMinDataLength(4);
+
+                        // Set the target entity to the array.
+                        arrayEventInfo.set(channel, tempEventInfo);
+
                         break;
                     case 5:
-                        // Ignore for now.
+                        // 1.5.3 Continuous A/D Data Blocks
+                        // Analog
+                        // Get the target entity from the array.
+                        AnalogInfo tempAnalogInfo = arrayAnalogInfo.get(channel);
+
+                        // Get max/min value.
+                        ArrayList<Double> tempArrayAnalogDataForSort = dWaveform;
+                        Collections.sort(tempArrayAnalogDataForSort);
+                        double analogMinVal = tempArrayAnalogDataForSort.get(0);
+                        double analogMaxVal = tempArrayAnalogDataForSort.get(tempArrayAnalogDataForSort.size() - 1);
+                        tempAnalogInfo.setMinVal(analogMinVal);
+                        tempAnalogInfo.setMaxVal(analogMaxVal);
+
+                        // Add Values to the target entity.
+                        ArrayList<AnalogData> analogData = tempAnalogInfo.getData();
+                        if (analogData == null) {
+                            analogData = new ArrayList<AnalogData>();
+                        }
+                        AnalogData tempAnalogData = new AnalogData(dTimestamp, dWaveform.size(), dWaveform);
+
+                        analogData.add(tempAnalogData);
+                        tempAnalogInfo.setData(analogData);
+
+                        // Modify members of EntityInfo.
+                        EntityInfo tempEntityInfo03 = tempAnalogInfo.getEntityInfo();
+                        tempEntityInfo03.setItemCount(tempEntityInfo03.getItemCount() + dWaveform.size());
+                        tempEntityInfo03.setDataPosition(position);
+                        tempEntityInfo03.setFilePath(plxFilePath);
+                        tempAnalogInfo.setEntityInfo(tempEntityInfo03);
+
+                        // Modify members of TagElement.
+                        Tag tempTagElement03 = tempAnalogInfo.getTag();
+                        tempTagElement03.setElemLength(tempTagElement03.getElemLength() + 8 + 4 + 8 * dWaveform.size());
+                        tempAnalogInfo.setTag(tempTagElement03);
+
+                        // Set the target entity to the array.
+                        arrayAnalogInfo.set(channel, tempAnalogInfo);
+
                         break;
                     default:
                     // Ignore for now.
@@ -734,6 +985,22 @@ public class PlxReader {
             raf.close();
 
             // Integrate all info.
+            for (int c = 0; c < arrayEventInfo.size(); c++) {
+                if (arrayEventInfo.get(c).getEntityInfo().getItemCount() != 0) {
+                    allEntities.add(arrayEventInfo.get(c));
+                } else {
+                    // reduce.
+                    fileInfo.setEntityCount(fileInfo.getEntityCount() - 1);
+                }
+            }
+            for (int c = 0; c < arrayAnalogInfo.size(); c++) {
+                if (slowChEnabled.get(c)) {
+                    allEntities.add(arrayAnalogInfo.get(c));
+                } else {
+                    // reduce.
+                    fileInfo.setEntityCount(fileInfo.getEntityCount() - 1);
+                }
+            }
             for (int c = 0; c < arraySegmentInfo.size(); c++) {
                 allEntities.add(arraySegmentInfo.get(c));
             }
@@ -790,6 +1057,8 @@ public class PlxReader {
 
             ArrayList<Entity> allEntities = new ArrayList<Entity>();
 
+            ArrayList<EventInfo> arrayEventInfo = null;
+            ArrayList<AnalogInfo> arrayAnalogInfo = null;
             ArrayList<SegmentInfo> arraySegmentInfo = null;
             ArrayList<NeuralInfo> arrayNeuralInfo = null;
 
@@ -1097,7 +1366,7 @@ public class PlxReader {
                 tempSegmentInfo.setMinSampleCount(numPointsWave);
                 tempSegmentInfo.setSampleRate(waveformFreq);
                 tempSegmentInfo.setUnits(schName);
-                
+
                 // Add SegmentInfo to arraySegmentInfo
                 arraySegmentInfo.add(tempSegmentInfo);
 
@@ -1109,7 +1378,7 @@ public class PlxReader {
 
                 // Tag
                 // 176 : ns_ENTITYINFO + ns_NEURALINFO
-                Tag tagNeural = new Tag(EntityType.ENTITY_NEURAL, 176);
+                Tag tagNeural = new Tag(EntityType.ENTITY_NEURAL, ConstantValues.NS_ENTITYINFO_LENGTH + ConstantValues.NS_NEURALINFO_LENGTH);
 
                 // EntityInfo
                 // 4 : NEURALEVENTENTITY, 0 : ItemCount
@@ -1171,6 +1440,14 @@ public class PlxReader {
 
             // 1.4 Continuous Channel Header
             //System.out.println("*** 1.4 Continuous Channel Header ***");
+
+            // SlowChannelHeaderGain : use when calculate voltage.
+            ArrayList<Integer> slowChGain = new ArrayList<Integer>();
+            // SlowChannelHeaderPreAmpGain : use when calculate voltage.
+            ArrayList<Integer> slowChPreAmpGain = new ArrayList<Integer>();
+            // SlowChannelHeaderEnabled : use when add entities.
+            ArrayList<Boolean> slowChEnabled = new ArrayList<Boolean>();
+
             // Repeat numSlowChannels times.
             for (int c = 0; c < numSlowChannels; c++) {
 
@@ -1194,14 +1471,22 @@ public class PlxReader {
                 // Gain : skip
                 int cchGain = ReaderUtils.readInt(raf);
                 //System.out.println("Gain : " + cchGain);
+                slowChGain.add(cchGain);
 
                 // Enabled : skip
                 int cchEnabled = ReaderUtils.readInt(raf);
                 //System.out.println("Enabled : " + cchEnabled);
+                if (cchEnabled == 0) {
+                    slowChEnabled.add(Boolean.FALSE);
+
+                } else {
+                    slowChEnabled.add(Boolean.TRUE);
+                }
 
                 // PreAmpGain : skip
                 int cchPreAmpGain = ReaderUtils.readInt(raf);
                 //System.out.println("PreAmpGain : " + cchPreAmpGain);
+                slowChPreAmpGain.add(cchPreAmpGain);
 
                 // SpikeChannel : skip
                 int cchSpikeChannel = ReaderUtils.readInt(raf);
@@ -1222,6 +1507,51 @@ public class PlxReader {
                     cchPadding[d] = ReaderUtils.readInt(raf);
                     //System.out.println("Padding[" + d + "] : " + cchPadding[d]);
                 }
+
+                // Continuous A/D Channel is saved as Analog Entity.
+
+                // Analog
+                // Create array if it is null.
+                if (arrayAnalogInfo == null) {
+                    arrayAnalogInfo = new ArrayList<AnalogInfo>();
+                }
+
+                // Tag
+                // 304 : ns_ENTITYINFO + ns_ANALOGINFO
+                Tag tagAnalog = new Tag(EntityType.ENTITY_ANALOG, ConstantValues.NS_ENTITYINFO_LENGTH + ConstantValues.NS_ANALOGINFO_LENGTH);
+
+                // EntityInfo
+                // 2 : ANALOGENTITY, 0 : ItemCount
+                EntityInfo entityInfoAnalog = new EntityInfo(cchName,
+                        EntityType.ENTITY_ANALOG, 0);
+
+                // AnalogInfo
+                AnalogInfo tempAnalogInfo = new AnalogInfo(tagAnalog,
+                        entityInfoAnalog);
+
+                // Modify members.
+                tempAnalogInfo.setSampleRate(cchADFreq);
+                tempAnalogInfo.setMinVal(Double.MAX_VALUE);
+                tempAnalogInfo.setMaxVal(Double.MIN_VALUE);
+                tempAnalogInfo.setUnits("mV");
+                tempAnalogInfo.setResolution(0); // TODO : fix it.
+                tempAnalogInfo.setLocationX(0);
+                tempAnalogInfo.setLocationY(0);
+                tempAnalogInfo.setLocationZ(0);
+                tempAnalogInfo.setLocationUser(0);
+                tempAnalogInfo.setHighFreqCorner(170);
+                tempAnalogInfo.setHighFreqOrder(4);
+                tempAnalogInfo.setHighFilterType("Butterworth");
+                tempAnalogInfo.setLowFreqCorner(0.7);
+                tempAnalogInfo.setLowFreqOrder(2);
+                tempAnalogInfo.setLowFilterType("Q=2");
+                tempAnalogInfo.setProbeInfo(cchComment);
+
+                // Add AnalogInfo to arrayAnalogInfo
+                arrayAnalogInfo.add(tempAnalogInfo);
+
+                // Analog
+                fileInfo.setEntityCount(fileInfo.getEntityCount() + 1);
 
             }
 
@@ -1283,24 +1613,61 @@ public class PlxReader {
                         // Calculate voltage. (See
                         // PlexonDataFileStrutureDocumentation.pdf)
                         // Switch cases.
-                        switch (version) {
-                            case 101:
-                            case 102:
-                                dValue = (dValue * 3000)
-                                        / (2048 * chGain.get(channel) * 1000);
+
+                        switch (type) {
+                            case 1:
+                                // 1.5.1 Spike Data Blocks
+                                switch (version) {
+                                    case 100:
+                                    case 101:
+                                    case 102:
+                                        dValue = (dValue * 3000)
+                                                / (2048 * chGain.get(channel) * 1000);
+                                        break;
+                                    case 103:
+                                    case 104:
+                                        dValue = (dValue * spikeMaxMagnitudeMV)
+                                                / (0.5 * Math.pow(2, bitsPerSpikeSample)
+                                                * chGain.get(channel) * 1000);
+                                        break;
+                                    case 105:
+                                        dValue = (dValue * spikeMaxMagnitudeMV)
+                                                / (0.5 * Math.pow(2, bitsPerSpikeSample)
+                                                * chGain.get(channel) * spikePreAmpGain);
+                                        break;
+                                    default:
+                                        // Greater 105.
+                                        dValue = (dValue * spikeMaxMagnitudeMV)
+                                                / (0.5 * Math.pow(2, bitsPerSpikeSample)
+                                                * chGain.get(channel) * spikePreAmpGain);
+                                        break;
+                                }
+
                                 break;
-                            case 103:
-                            case 104:
-                                dValue = (dValue * spikeMaxMagnitudeMV)
-                                        / (0.5 * Math.pow(2, bitsPerSpikeSample)
-                                        * chGain.get(channel) * 1000);
-                                break;
-                            case 105:
-                                dValue = (dValue * spikeMaxMagnitudeMV)
-                                        / (0.5 * Math.pow(2, bitsPerSpikeSample)
-                                        * chGain.get(channel) * spikePreAmpGain);
-                                break;
-                            default:
+                            case 5:
+                                // 1.5.3 Continuous A/D Data Blocks
+                                switch (version) {
+                                    case 100:
+                                    case 101:
+                                        dValue = (dValue * 5000)
+                                                / (2048 * slowChGain.get(channel) * 1000);
+                                        break;
+                                    case 102:
+                                        dValue = (dValue * 5000)
+                                                / (2048 * slowChGain.get(channel) * slowChPreAmpGain.get(channel));
+                                        break;
+                                    case 103:
+                                        dValue = (dValue * slowMaxMagnitudeMV)
+                                                / (0.5 * Math.pow(2, bitsPerSlowSample)
+                                                * slowChGain.get(channel) * slowChPreAmpGain.get(channel));
+                                        break;
+                                    default:
+                                        // Greater 103.
+                                        dValue = (dValue * slowMaxMagnitudeMV)
+                                                / (0.5 * Math.pow(2, bitsPerSlowSample)
+                                                * slowChGain.get(channel) * slowChPreAmpGain.get(channel));
+                                        break;
+                                }
                                 break;
                         }
 
@@ -1398,7 +1765,7 @@ public class PlxReader {
 
                         // Modify members of EntityInfo.
                         EntityInfo tempEntityInfo01 = tempSegmentInfo.getEntityInfo();
-                        tempEntityInfo01.setItemCount(tempEntityInfo01.getItemCount() + dWaveform.size());
+                        tempEntityInfo01.setItemCount(tempEntityInfo01.getItemCount() + 1);
                         tempEntityInfo01.setDataPosition(position);
                         tempEntityInfo01.setFilePath(path);
                         tempSegmentInfo.setEntityInfo(tempEntityInfo01);
@@ -1442,10 +1809,41 @@ public class PlxReader {
 
                         break;
                     case 4:
+                        // 1.5.2 Event Data Blocks
+
                         // Ignore for now.
                         break;
                     case 5:
-                        // Ignore for now.
+                        // 1.5.3 Continuous A/D Data Blocks
+                        // Analog
+                        // Get the target entity from the array.
+                        AnalogInfo tempAnalogInfo = arrayAnalogInfo.get(channel);
+
+                        // Add Values to the target entity.
+                        ArrayList<AnalogData> analogData = tempAnalogInfo.getData();
+                        if (analogData == null) {
+                            analogData = new ArrayList<AnalogData>();
+                        }
+                        AnalogData tempAnalogData = new AnalogData(dTimestamp, dWaveform.size(), dWaveform);
+
+                        analogData.add(tempAnalogData);
+                        // No need to set Data here.
+                        // tempAnalogInfo.setData(analogData);
+
+                        // Modify members of EntityInfo.
+                        EntityInfo tempEntityInfo03 = tempAnalogInfo.getEntityInfo();
+                        tempEntityInfo03.setItemCount(tempEntityInfo03.getItemCount() + dWaveform.size());
+                        tempEntityInfo03.setDataPosition(position);
+                        tempEntityInfo03.setFilePath(path);
+                        tempAnalogInfo.setEntityInfo(tempEntityInfo03);
+
+                        // Modify members of TagElement.
+                        Tag tempTagElement03 = tempAnalogInfo.getTag();
+                        tempTagElement03.setElemLength(tempTagElement03.getElemLength() + 8 + 4 + 8 * dWaveform.size());
+                        tempAnalogInfo.setTag(tempTagElement03);
+
+                        // Set the target entity to the array.
+                        arrayAnalogInfo.set(channel, tempAnalogInfo);
                         break;
                     default:
                     // Ignore for now.
@@ -1457,6 +1855,14 @@ public class PlxReader {
             raf.close();
 
             // Integrate all info.
+            for (int c = 0; c < arrayAnalogInfo.size(); c++) {
+                if (slowChEnabled.get(c)) {
+                    allEntities.add(arrayAnalogInfo.get(c));
+                } else {
+                    // reduce.
+                    fileInfo.setEntityCount(fileInfo.getEntityCount() - 1);
+                }
+            }
             for (int c = 0; c < arraySegmentInfo.size(); c++) {
                 allEntities.add(arraySegmentInfo.get(c));
             }

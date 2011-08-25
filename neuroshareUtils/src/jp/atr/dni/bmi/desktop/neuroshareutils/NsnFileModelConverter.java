@@ -79,8 +79,13 @@ public class NsnFileModelConverter {
                     break;
                 case ENTITY_EVENT:
                     // Event
+
+                    EventInfo eventInfo = (EventInfo) nsObj.getEntities().get(i);
+                    EventType eventType = eventInfo.getEventType();
+
                     // Create new Event Entity (input arg is ns_ENTITYINFO.szEntityLabel.)
-                    NSNEventData nsEd = nsFile.newEventData(ei.getEntityLabel());
+//                    NSNEventData nsEd = nsFile.newEventData(ei.getEntityLabel());
+                    NSNEventData nsEd = nsFile.newEventData(ei.getEntityLabel(), eventType);
                     if (nsEd == null) {
                         // new Event error - input args error.
                     }
@@ -91,8 +96,6 @@ public class NsnFileModelConverter {
                     if (nsaEventInfo == null) {
                         // Get EventInfo error - input args error.
                     }
-
-                    EventInfo eventInfo = (EventInfo) nsObj.getEntities().get(i);
 
                     // Modify members.
                     // [can not edit] dwEventType. ::: For consistency of data.
@@ -150,8 +153,10 @@ public class NsnFileModelConverter {
                                 break;
                             case EVENT_DWORD:
                                 // ns_EVENT_DWORD
-                                rtnval2 = nsEd.addEventData(eventData.get(j).getTimestamp(),
-                                        ((int) (long) ((DWordEventData) eventData.get(j)).getData()));
+                                int value = ((DWordEventData) eventData.get(j)).getData().intValue();
+//                                rtnval2 = nsEd.addEventData(eventData.get(j).getTimestamp(),
+//                                        (((DWordEventData) eventData.get(j)).getData()).intValue());
+                                rtnval2 = nsEd.addEventData(eventData.get(j).getTimestamp(), value);
                                 if (rtnval2 != 0) {
                                     // add error. - input arg error - or intermediate file i/o error.
                                 }
