@@ -70,10 +70,10 @@ public class PlxReader {
 
             ArrayList<Entity> allEntities = new ArrayList<Entity>();
 
-            ArrayList<EventInfo> arrayEventInfo = null;
-            ArrayList<AnalogInfo> arrayAnalogInfo = null;
-            ArrayList<SegmentInfo> arraySegmentInfo = null;
-            ArrayList<NeuralInfo> arrayNeuralInfo = null;
+            ArrayList<EventInfo> arrayEventInfo = new ArrayList<EventInfo>();
+            ArrayList<AnalogInfo> arrayAnalogInfo = new ArrayList<AnalogInfo>();
+            ArrayList<SegmentInfo> arraySegmentInfo = new ArrayList<SegmentInfo>();
+            ArrayList<NeuralInfo> arrayNeuralInfo = new ArrayList<NeuralInfo>();
 
             // 1.1 File Header
             //System.out.println("*** 1.1 File Header ***");
@@ -96,7 +96,7 @@ public class PlxReader {
             comment = bufStr.replaceAll(nullStr, "");
             //System.out.println("Comment : " + comment);
 
-            // ADFrequency : skip
+            // ADFrequency : ns_SEGMENTINFO.dSampleRate
             int aDFrequency = ReaderUtils.readInt(raf);
             //System.out.println("ADFrequency : " + aDFrequency);
 
@@ -153,7 +153,7 @@ public class PlxReader {
             int fastRead = ReaderUtils.readInt(raf);
             //System.out.println("FastRead : " + fastRead);
 
-            // WaveformFreq : ns_SEGMENTINFO.dSampleRate
+            // WaveformFreq : skip
             int waveformFreq = ReaderUtils.readInt(raf);
             //System.out.println("WaveformFreq : " + waveformFreq);
 
@@ -198,12 +198,48 @@ public class PlxReader {
             padding = bufStr.replaceAll(nullStr, "");
             //System.out.println("Padding : " + padding);
 
-            // TSCounts[130][5] : skip
+            // TSCounts[130][5] : Total num of not 0 value equals num of NeuralEventEntities.
             int tSCounts[][] = new int[130][5];
+            int neuralEventEntityIndex[][] = new int[130][5];
+            int indexCounter = 0;
             for (int c = 0; c < 130; c++) {
                 for (int d = 0; d < 5; d++) {
                     tSCounts[c][d] = ReaderUtils.readInt(raf);
                     //System.out.println("TSCount[" + c + "][" + d + "] : "+tSCounts[c][d]);
+
+                    // Create NeuralEventEntity if tsCounts[c][d] is not 0.
+                    if (tSCounts[c][d] == 0) {
+                        neuralEventEntityIndex[c][d] = -1;
+                    } else {
+
+                        // count up.
+                        neuralEventEntityIndex[c][d] = indexCounter;
+                        indexCounter++;
+
+                        // Create NeuralEventEntity.
+
+                        // NeuralEvent
+
+                        // Tag
+                        // 176 : ns_ENTITYINFO + ns_NEURALINFO
+                        Tag tagNeural = new Tag(EntityType.ENTITY_NEURAL, ConstantValues.NS_ENTITYINFO_LENGTH + ConstantValues.NS_NEURALINFO_LENGTH);
+
+                        // EntityInfo
+                        // 4 : NEURALEVENTENTITY, 0 : ItemCount
+                        EntityInfo entityInfoNeural = new EntityInfo("",
+                                EntityType.ENTITY_NEURAL, 0);
+
+                        // NeuralInfo
+                        NeuralInfo tempNeuralInfo = new NeuralInfo(tagNeural,
+                                entityInfoNeural);
+
+                        // Add NeuralInfo to arrayNeuralInfo
+                        arrayNeuralInfo.add(tempNeuralInfo);
+
+                        // NeuralEvent
+                        fileInfo.setEntityCount(fileInfo.getEntityCount() + 1);
+
+                    }
                 }
             }
 
@@ -356,10 +392,6 @@ public class PlxReader {
                 // Spike Channel is saved as Segment , NeuralEvent Entity.
 
                 // Segment
-                // Create array if it is null.
-                if (arraySegmentInfo == null) {
-                    arraySegmentInfo = new ArrayList<SegmentInfo>();
-                }
 
                 // Tag
                 // 92 : ns_ENTITYINFO + ns_SEGMENTINFO
@@ -378,51 +410,43 @@ public class PlxReader {
                 tempSegmentInfo.setSourceCount(0);
                 tempSegmentInfo.setMinSampleCount(numPointsWave);
                 tempSegmentInfo.setMinSampleCount(numPointsWave);
-                tempSegmentInfo.setSampleRate(waveformFreq);
+                tempSegmentInfo.setSampleRate(aDFrequency);
                 tempSegmentInfo.setUnits(schName);
 
                 // Add SegmentInfo to arraySegmentInfo
                 arraySegmentInfo.add(tempSegmentInfo);
 
+                // Segment
+                fileInfo.setEntityCount(fileInfo.getEntityCount() + 1);
+
                 // NeuralEvent
-                // Create array if it is null.
-                if (arrayNeuralInfo == null) {
-                    arrayNeuralInfo = new ArrayList<NeuralInfo>();
+
+                // Set NeuralEvent.
+                for (int ii = 0; ii < 5; ii++) {
+                    int index = neuralEventEntityIndex[schChannel][ii];
+                    if (index < 0) {
+                        continue;
+                    }
+
+                    // NeuralInfo
+                    NeuralInfo tempNeuralInfo = arrayNeuralInfo.get(index);
+                    EntityInfo tempEntityInfo = tempNeuralInfo.getEntityInfo();
+                    tempEntityInfo.setEntityLabel(schName);
+                    tempNeuralInfo.setEntityInfo(tempEntityInfo);
+
+                    // Modify members.
+                    tempNeuralInfo.setSourceEntityID(schChannel);
+                    tempNeuralInfo.setSourceUnitID(ii);
+                    tempNeuralInfo.setProbeInfo(schName.toUpperCase());
+
+                    // Add NeuralInfo to arrayNeuralInfo
+                    arrayNeuralInfo.set(index, tempNeuralInfo);
                 }
-
-                // Tag
-                // 176 : ns_ENTITYINFO + ns_NEURALINFO
-                Tag tagNeural = new Tag(EntityType.ENTITY_NEURAL, ConstantValues.NS_ENTITYINFO_LENGTH + ConstantValues.NS_NEURALINFO_LENGTH);
-
-                // EntityInfo
-                // 4 : NEURALEVENTENTITY, 0 : ItemCount
-                EntityInfo entityInfoNeural = new EntityInfo(schName,
-                        EntityType.ENTITY_NEURAL, 0);
-
-                // NeuralInfo
-                NeuralInfo tempNeuralInfo = new NeuralInfo(tagNeural,
-                        entityInfoNeural);
-
-                // Modify members.
-                tempNeuralInfo.setSourceEntityID(schChannel);
-                tempNeuralInfo.setSourceUnitID(schNUnits);
-                tempNeuralInfo.setProbeInfo(schName);
-
-                // Add NeuralInfo to arrayNeuralInfo
-                arrayNeuralInfo.add(tempNeuralInfo);
-
-                // Segment and NeuralEvent
-                fileInfo.setEntityCount(fileInfo.getEntityCount() + 2);
 
             }
 
             // 1.3 Event Channel Header
             //System.out.println("*** 1.3 Event Channel Header ***");
-
-            // Create array if it is null.
-            if (arrayEventInfo == null) {
-                arrayEventInfo = new ArrayList<EventInfo>();
-            }
 
             // Add First Event.
             // Tag
@@ -591,10 +615,6 @@ public class PlxReader {
                 // Continuous A/D Channel is saved as Analog Entity.
 
                 // Analog
-                // Create array if it is null.
-                if (arrayAnalogInfo == null) {
-                    arrayAnalogInfo = new ArrayList<AnalogInfo>();
-                }
 
                 // Tag
                 // 304 : ns_ENTITYINFO + ns_ANALOGINFO
@@ -766,7 +786,8 @@ public class PlxReader {
 
                         // Segment
                         // Get the target entity from the array.
-                        SegmentInfo tempSegmentInfo = arraySegmentInfo.get(channel);
+                        int segChannel = ((Integer) (((Short) channel).intValue() - 1)).shortValue();
+                        SegmentInfo tempSegmentInfo = arraySegmentInfo.get(segChannel);
 
                         // Create tempSegmentSourceInfo for adding it to the target
                         // entity.
@@ -858,11 +879,12 @@ public class PlxReader {
                         tempSegmentInfo.setTag(tempTagElement01);
 
                         // Set the target entity to the array.
-                        arraySegmentInfo.set(channel, tempSegmentInfo);
+                        arraySegmentInfo.set(segChannel, tempSegmentInfo);
 
                         // Neural Event
                         // Get the target entity from the array.
-                        NeuralInfo tempNeuralInfo = arrayNeuralInfo.get(channel);
+                        int index = neuralEventEntityIndex[channel][unit];
+                        NeuralInfo tempNeuralInfo = arrayNeuralInfo.get(index);
 
                         // Add Values to the target entity.
                         ArrayList<Double> data = tempNeuralInfo.getData();
@@ -885,7 +907,7 @@ public class PlxReader {
                         tempNeuralInfo.setTag(tempTagElement02);
 
                         // Set the target entity to the array.
-                        arrayNeuralInfo.set(channel, tempNeuralInfo);
+                        arrayNeuralInfo.set(index, tempNeuralInfo);
 
                         break;
                     case 4:
@@ -911,7 +933,7 @@ public class PlxReader {
                             tempEventData = new ArrayList<EventData>();
                         }
                         DWordEventData a = new DWordEventData(dTimestamp, 4);
-                        a.setData(((Short)value).longValue());
+                        a.setData(((Short) value).longValue());
                         tempEventData.add(a);
 
                         // Modify members of EntityInfo.
