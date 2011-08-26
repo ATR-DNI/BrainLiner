@@ -841,9 +841,8 @@ public class PlxReader {
 
                         // Get max/min value.
                         ArrayList<Double> tempArraySegDataForSort = dWaveform;
-                        Collections.sort(tempArraySegDataForSort);
-                        double minVal = tempArraySegDataForSort.get(0);
-                        double maxVal = tempArraySegDataForSort.get(tempArraySegDataForSort.size() - 1);
+                        double minVal = Collections.min(tempArraySegDataForSort);
+                        double maxVal = Collections.max(tempArraySegDataForSort);
 
                         // Modify members of SegmentSourceInfo.
                         if(tempSegmentSourceInfo.getMinVal() > minVal){
@@ -969,11 +968,14 @@ public class PlxReader {
 
                         // Get max/min value.
                         ArrayList<Double> tempArrayAnalogDataForSort = dWaveform;
-                        Collections.sort(tempArrayAnalogDataForSort);
-                        double analogMinVal = tempArrayAnalogDataForSort.get(0);
-                        double analogMaxVal = tempArrayAnalogDataForSort.get(tempArrayAnalogDataForSort.size() - 1);
-                        tempAnalogInfo.setMinVal(analogMinVal);
-                        tempAnalogInfo.setMaxVal(analogMaxVal);
+                        double analogMinVal = Collections.min(tempArrayAnalogDataForSort);
+                        double analogMaxVal = Collections.max(tempArrayAnalogDataForSort);
+                        if(tempAnalogInfo.getMinVal() > analogMinVal){
+                            tempAnalogInfo.setMinVal(analogMinVal);
+                        }
+                        if(tempAnalogInfo.getMaxVal() < analogMaxVal){
+                            tempAnalogInfo.setMaxVal(analogMaxVal);
+                        }
 
                         // Add Values to the target entity.
                         ArrayList<AnalogData> analogData = tempAnalogInfo.getData();
@@ -1760,9 +1762,8 @@ public class PlxReader {
 
                         // Get max/min value.
                         ArrayList<Double> tempArraySegDataForSort = dWaveform;
-                        Collections.sort(tempArraySegDataForSort);
-                        double minVal = tempArraySegDataForSort.get(0);
-                        double maxVal = tempArraySegDataForSort.get(tempArraySegDataForSort.size() - 1);
+                        double minVal = Collections.min(tempArraySegDataForSort);
+                        double maxVal = Collections.max(tempArraySegDataForSort);
 
                         // Modify members of SegmentSourceInfo.
                         tempSegmentSourceInfo.setMinVal(minVal);
