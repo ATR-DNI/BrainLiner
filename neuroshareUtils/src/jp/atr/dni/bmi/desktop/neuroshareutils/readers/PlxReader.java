@@ -926,6 +926,11 @@ public class PlxReader {
                         if (channel == 259) {
                             channel = ((Integer) (arrayEventInfo.size() - 1)).shortValue();
                         }
+                        // Skip if channel value is wrong.
+                        if (channel >= arrayEventInfo.size()){
+                            System.out.println("Event Wrong channel number : " + channel);
+                            continue;
+                        }
 
                         // Get the target entity from the array.
                         EventInfo tempEventInfo = arrayEventInfo.get(channel);
@@ -1043,7 +1048,7 @@ public class PlxReader {
             // //System.out.println("Result of nsObj : " + nsObj.toString());
 
         } catch (Exception e) {
-            e.printStackTrace();
+            System.out.println("Error (PlxReader.java) : " + e.getStackTrace());
         }
 
         return nsObj;
