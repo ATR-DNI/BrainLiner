@@ -201,7 +201,7 @@ public class PlxReader {
             // TSCounts[130][5] : Total num of not 0 value equals num of NeuralEventEntities.
             int tSCounts[][] = new int[130][5];
             int neuralEventEntityIndex[][] = new int[130][5];
-            int indexCounter = 0;
+            int neuralEventEntityCounter = 0;
             for (int c = 0; c < 130; c++) {
                 for (int d = 0; d < 5; d++) {
                     tSCounts[c][d] = ReaderUtils.readInt(raf);
@@ -213,8 +213,8 @@ public class PlxReader {
                     } else {
 
                         // count up.
-                        neuralEventEntityIndex[c][d] = indexCounter;
-                        indexCounter++;
+                        neuralEventEntityIndex[c][d] = neuralEventEntityCounter;
+                        neuralEventEntityCounter++;
 
                         // Create NeuralEventEntity.
 
@@ -254,9 +254,49 @@ public class PlxReader {
 
             // EVCounts[512] : skip
             int eVCounts[] = new int[512];
+            int eventEntityIndex[] = new int[512];
+            int eventEntityCounter = 0;
             for (int c = 0; c < 512; c++) {
                 eVCounts[c] = ReaderUtils.readInt(raf);
                 //System.out.println("EVCount[" + c + "] : " + eVCounts[c]);
+
+                // EVCounts[0-299] : Create EventEntity if EVCounts[c] is not 0.
+                // EVCounts[300-511] : Nothing to do.
+                if (c > 299) {
+                    continue;
+                }
+
+                if (eVCounts[c] == 0) {
+                    eventEntityIndex[c] = -1;
+                } else {
+
+                    // count up.
+                    eventEntityIndex[c] = eventEntityCounter;
+                    eventEntityCounter++;
+
+                    // Create EventEntity.
+
+                    // Event
+                    // Tag
+                    // 180 : ns_ENTITYINFO + ns_EVENTINFO
+                    Tag tagEvent = new Tag(EntityType.ENTITY_EVENT, ConstantValues.NS_ENTITYINFO_LENGTH + ConstantValues.NS_EVENTINFO_LENGTH);
+
+                    // EntityInfo
+                    // 1 : EVENTENTITY, 0 : ItemCount
+                    EntityInfo entityInfoEvent = new EntityInfo("",
+                            EntityType.ENTITY_EVENT, 0);
+
+                    // EventInfo
+                    EventInfo tempEventInfo = new EventInfo(tagEvent, entityInfoEvent, EventType.EVENT_DWORD, 4, 4, "");
+
+                    // Add EventInfo to arrayEventInfo
+                    arrayEventInfo.add(tempEventInfo);
+
+                    // Event
+                    fileInfo.setEntityCount(fileInfo.getEntityCount() + 1);
+
+                }
+
             }
 
             // Modify the object.
@@ -455,25 +495,6 @@ public class PlxReader {
             // 1.3 Event Channel Header
             //System.out.println("*** 1.3 Event Channel Header ***");
 
-            // Add First Event.
-            // Tag
-            // 180 : ns_ENTITYINFO + ns_EVENTINFO
-            Tag tagFirstEvent = new Tag(EntityType.ENTITY_EVENT, ConstantValues.NS_ENTITYINFO_LENGTH + ConstantValues.NS_EVENTINFO_LENGTH);
-
-            // EntityInfo
-            // 1 : EVENTENTITY, 0 : ItemCount
-            EntityInfo entityInfoFirstEvent = new EntityInfo("Start",
-                    EntityType.ENTITY_EVENT, 0);
-
-            // EventInfo
-            EventInfo tempFirstEventInfo = new EventInfo(tagFirstEvent, entityInfoFirstEvent, EventType.EVENT_DWORD, 4, 4, "");
-
-            // Add EventInfo to arrayEventInfo
-            arrayEventInfo.add(tempFirstEventInfo);
-
-            // Event
-            fileInfo.setEntityCount(fileInfo.getEntityCount() + 1);
-
             // Repeat numEventChannels times.
             for (int c = 0; c < numEventChannels; c++) {
 
@@ -507,47 +528,21 @@ public class PlxReader {
                 }
 
                 // Event Channel is saved as Event Entity.
-
-                // Event
-                // Tag
-                // 180 : ns_ENTITYINFO + ns_EVENTINFO
-                Tag tagEvent = new Tag(EntityType.ENTITY_EVENT, ConstantValues.NS_ENTITYINFO_LENGTH + ConstantValues.NS_EVENTINFO_LENGTH);
-
-                // EntityInfo
-                // 1 : EVENTENTITY, 0 : ItemCount
-                EntityInfo entityInfoEvent = new EntityInfo(echName,
-                        EntityType.ENTITY_EVENT, 0);
+                int index = eventEntityIndex[c];
+                if (index < 0) {
+                    continue;
+                }
 
                 // EventInfo
-                EventInfo tempEventInfo = new EventInfo(tagEvent, entityInfoEvent, EventType.EVENT_DWORD, 4, 4, "");
+                EventInfo tempEventInfo = arrayEventInfo.get(index);
+                EntityInfo tempEntityInfo = tempEventInfo.getEntityInfo();
+                tempEntityInfo.setEntityLabel(echName);
+                tempEventInfo.setEntityInfo(tempEntityInfo);
 
                 // Add EventInfo to arrayEventInfo
-                arrayEventInfo.add(tempEventInfo);
-
-                // Event
-                fileInfo.setEntityCount(fileInfo.getEntityCount() + 1);
+                arrayEventInfo.set(index, tempEventInfo);
 
             }
-
-            // Add End Event.
-            // Tag
-            // 180 : ns_ENTITYINFO + ns_EVENTINFO
-            Tag tagEndEvent = new Tag(EntityType.ENTITY_EVENT, ConstantValues.NS_ENTITYINFO_LENGTH + ConstantValues.NS_EVENTINFO_LENGTH);
-
-            // EntityInfo
-            // 1 : EVENTENTITY, 0 : ItemCount
-            EntityInfo entityInfoEndEvent = new EntityInfo("Stop",
-                    EntityType.ENTITY_EVENT, 0);
-
-            // EventInfo
-            EventInfo tempEndEventInfo = new EventInfo(tagEndEvent, entityInfoEndEvent, EventType.EVENT_DWORD, 4, 4, "");
-
-            // Add EventInfo to arrayEventInfo
-            arrayEventInfo.add(tempEndEventInfo);
-
-            // Event
-            fileInfo.setEntityCount(fileInfo.getEntityCount() + 1);
-
 
             // 1.4 Continuous Channel Header
             //System.out.println("*** 1.4 Continuous Channel Header ***");
@@ -845,17 +840,17 @@ public class PlxReader {
                         double maxVal = Collections.max(tempArraySegDataForSort);
 
                         // Modify members of SegmentSourceInfo.
-                        if(tempSegmentSourceInfo.getMinVal() > minVal){
+                        if (tempSegmentSourceInfo.getMinVal() > minVal) {
                             tempSegmentSourceInfo.setMinVal(minVal);
                         }
-                        if(tempSegmentSourceInfo.getMaxVal() < maxVal){
+                        if (tempSegmentSourceInfo.getMaxVal() < maxVal) {
                             tempSegmentSourceInfo.setMaxVal(maxVal);
                         }
                         // Modify members of SegmentInfo.
-                        if(tempSegmentInfo.getMinSampleCount() > numberOfWordsInWaveform){
+                        if (tempSegmentInfo.getMinSampleCount() > numberOfWordsInWaveform) {
                             tempSegmentInfo.setMinSampleCount(numberOfWordsInWaveform);
                         }
-                        if(tempSegmentInfo.getMaxSampleCount() < numberOfWordsInWaveform){
+                        if (tempSegmentInfo.getMaxSampleCount() < numberOfWordsInWaveform) {
                             tempSegmentInfo.setMaxSampleCount(numberOfWordsInWaveform);
                         }
 
@@ -864,7 +859,7 @@ public class PlxReader {
                         if (segSourceInfos == null) {
                             segSourceInfos = new ArrayList<SegmentSourceInfo>();
                         }
-                        segSourceInfos.set(0,tempSegmentSourceInfo);
+                        segSourceInfos.set(0, tempSegmentSourceInfo);
                         tempSegmentInfo.setSegSourceInfos(segSourceInfos);
 
                         // Modify members of EntityInfo.
@@ -918,20 +913,8 @@ public class PlxReader {
                         // Event
 
                         short value = channel;
-                        // if channel == 258 then First value.
-                        if (channel == 258) {
-                            channel = 0;
-                        }
-                        // if channel == 259 then End value.
-                        if (channel == 259) {
-                            channel = ((Integer) (arrayEventInfo.size() - 1)).shortValue();
-                        }
-                        // Skip if channel value is wrong.
-                        if (channel >= arrayEventInfo.size()){
-                            System.out.println("Event Wrong channel number : " + channel);
-                            continue;
-                        }
-
+                        channel = ((Integer)eventEntityIndex[channel]).shortValue();
+                        
                         // Get the target entity from the array.
                         EventInfo tempEventInfo = arrayEventInfo.get(channel);
 
@@ -975,10 +958,10 @@ public class PlxReader {
                         ArrayList<Double> tempArrayAnalogDataForSort = dWaveform;
                         double analogMinVal = Collections.min(tempArrayAnalogDataForSort);
                         double analogMaxVal = Collections.max(tempArrayAnalogDataForSort);
-                        if(tempAnalogInfo.getMinVal() > analogMinVal){
+                        if (tempAnalogInfo.getMinVal() > analogMinVal) {
                             tempAnalogInfo.setMinVal(analogMinVal);
                         }
-                        if(tempAnalogInfo.getMaxVal() < analogMaxVal){
+                        if (tempAnalogInfo.getMaxVal() < analogMaxVal) {
                             tempAnalogInfo.setMaxVal(analogMaxVal);
                         }
 
