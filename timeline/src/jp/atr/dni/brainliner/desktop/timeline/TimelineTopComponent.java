@@ -587,7 +587,7 @@ public final class TimelineTopComponent extends TopComponent implements GLEventL
     * 1) grid
     * 2) data
     * 3) labels
-    * 4) timeline
+    * 4) timeline scrollbars
     *
     * @param drawable
     */
@@ -608,26 +608,6 @@ public final class TimelineTopComponent extends TopComponent implements GLEventL
       glCanvas.setSize(width, height);
 
       gl.glMatrixMode(GL2.GL_PROJECTION);
-//        gl.glLoadIdentity();
-//        gl.glOrtho(0, 640, 480, 0, -1, 1);
-//        gl.glMatrixMode(GL2.GL_MODELVIEW);
-
-//      if (SHOW_GRID){
-//         gl.glLoadIdentity();
-//      }
-//      
-
-//      gl.glLoadIdentity();
-//      gl.glTranslated(translationX / (width*.5), translationY / (height*.5), 0);
-//      gl.glScaled(scale, scale, 0);
-//      gl.glLoadIdentity();
-//glu.gluOrtho2D (0,
-//                 getWidth(),
-//                0,
-//                getHeight());
-
-//      gl.glViewport(0, 0, width, height);//TODO: look into this some more
-
       gl.glColor3i(0, 0, 0);
 
       //Draw data
@@ -653,17 +633,12 @@ public final class TimelineTopComponent extends TopComponent implements GLEventL
          if (vc.getType() == ChannelType.ANALOG) {
             double timeIncrement = 1000.0 / vc.getSamplingRate();
 
-            // Get TSData from the WorkingFile to display.
-
             //TODO: add ability to draw data after gaps!
             APIList<Double> vals = ((NSNAnalogData) vc.getData()).getValues().get(0);
 
-//            System.out.println("label: " + vc.getLabel() + "\tsize: " + vals.size());
-
-            double prevX = minPoint.getX() > 2 ? (int) ((minPoint.getX() - 1) / timeIncrement) : 0;
-//            double prevX = 0;
-//            prevX /= timeIncrement;
-            prevX = prevX % 2 == 0 ? prevX : prevX - 1;
+            double prevX = minPoint.getX() > 1 ? (int) minPoint.getX() : 0;// minPoint.getX() > 2 ? (int) ((minPoint.getX() - 1)) : 0;
+            prevX *= timeIncrement;
+            prevX = ((int) prevX) % 2 == 0 ? prevX : prevX - 1;
 
             int xLimit = (int) (maxPoint.getX() / timeIncrement);
             xLimit += prevX + 2;
@@ -671,18 +646,20 @@ public final class TimelineTopComponent extends TopComponent implements GLEventL
             if (vals.size() < xLimit) {
                xLimit = vals.size();
             }
-            double xVal = prevX * timeIncrement;
 
-            int ndx = (int) prevX;
+            double xVal = prevX;/// timeIncrement;
+            int ndx = (int) (prevX/timeIncrement);
 
+//            System.out.println("ndx: " + ndx + "\txLimit: " + xLimit + "\tprevX: " + prevX + "\txVal: " + xVal + "\ttimeIncr: " + timeIncrement);
             if (ndx < vals.size()) {
                prevY = ((vals.get(ndx) - vc.getSubtractor()) / vc.getNormalizer()) - yOffset * Y_SPACER;
             }
-//            ndx = ndx % 2 == 0 ? ndx : ndx - 1;
+
+            ndx = ndx % 2 != 0 ? ndx +1: ndx ;
 //System.out.println("xlimit: " + xLimit + "\txVal: " + xVal + "\tprevX: " + prevX + "\tsize: " + vals.size());
-            boolean drawed = false;
+            boolean drawn = false;
             for (; ndx < xLimit; ndx++) {
-               drawed = true;
+               drawn = true;
                if (ndx % 2 == 0) {
                   Point2D p = getScreenCoordinates(prevX, prevY);
                   gl.glVertex2d(p.getX(), p.getY());
@@ -695,7 +672,7 @@ public final class TimelineTopComponent extends TopComponent implements GLEventL
                xVal += timeIncrement;
             }
             //close any open lines
-            if (drawed && ndx % 2 != 0) {
+            if (drawn && ndx % 2 != 0) {
                Point2D p = getScreenCoordinates(prevX, prevY);
                gl.glVertex2d(p.getX(), p.getY());
             }
