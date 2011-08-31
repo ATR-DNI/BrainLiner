@@ -132,7 +132,7 @@ public class CreateNewNeuroshareFile {
                         // ns_EVENT_BYTE
 //                                    rtnval2 = nsEd.addEventData(tLData.getTimeStamp(ii), (Byte) (tLData.getValue(ii)));
                         NSNEvent event = timeLabelData.getEvents().get(ii);
-                        rtnval2 = nsEd.addEventData(event.getTimestamp(), Byte.parseByte((String) event.getValue()));
+                        rtnval2 = nsEd.addEventData(event.getTimestamp(), (Byte) event.getValue());
                         if (rtnval2 != 0) {
                             // add error. - input arg error - or intermediate file i/o error.
                         }
@@ -143,7 +143,8 @@ public class CreateNewNeuroshareFile {
                         // ns_EVENT_WORD
 //                                    rtnval2 = nsEd.addEventData(tLData.getTimeStamp(ii), (Short) (tLData.getValue(ii)));
                         NSNEvent event = timeLabelData.getEvents().get(ii);
-                        rtnval2 = nsEd.addEventData(event.getTimestamp(), Short.parseShort((String) event.getValue()));
+//                        rtnval2 = nsEd.addEventData(event.getTimestamp(), Short.parseShort((String) event.getValue()));
+                        rtnval2 = nsEd.addEventData(event.getTimestamp(), (Short) event.getValue());
                         if (rtnval2 != 0) {
                             // add error. - input arg error - or intermediate file i/o error.
                         }
