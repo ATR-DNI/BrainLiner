@@ -29,8 +29,8 @@ public final class SegmentChannel implements Channel<NSNSegmentData> {
             }
         }
     }
-    
-    private void initialize(){
+
+    private void initialize() {
         this.data = new NSNSegmentData(nsnEntity);
     }
 
@@ -51,6 +51,7 @@ public final class SegmentChannel implements Channel<NSNSegmentData> {
 
     @Override
     public void setLabel(String label) {
+        nsnEntity.getEntityInfo().setEntityLabel(label);
     }
 
     @Override
@@ -60,6 +61,7 @@ public final class SegmentChannel implements Channel<NSNSegmentData> {
 
     @Override
     public void setItemCount(long itemCount) {
+        nsnEntity.getEntityInfo().setItemCount(itemCount);
     }
 
     @Override
@@ -73,7 +75,7 @@ public final class SegmentChannel implements Channel<NSNSegmentData> {
 
     @Override
     public NSNSegmentData getData() {
-        if(this.data == null){
+        if (this.data == null) {
             initialize();
         }
         return data;
@@ -193,6 +195,12 @@ public final class SegmentChannel implements Channel<NSNSegmentData> {
             return segmentSources.get(ndx);
         } else {
             return null;
+        }
+    }
+
+    public synchronized void setSegmentSource(int ndx, SegmentSourceInfo ssi) {
+        if (ndx >= 0 && ndx < segmentSources.size()) {
+            segmentSources.set(ndx, ssi);
         }
     }
 

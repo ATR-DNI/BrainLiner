@@ -16,156 +16,157 @@ import jp.atr.dni.bmi.desktop.neuroshareutils.EventType;
  */
 public final class EventChannel implements Channel<NSNEventData> {
 
-   private int id;
-   private EventInfo nsnEntity;
-   private NSNEventData data;
+    private int id;
+    private EventInfo nsnEntity;
+    private NSNEventData data;
 
-   public EventChannel(int id, EventInfo nsnEntity) {
-      this.id = id;
-      this.nsnEntity = nsnEntity;
-      this.data = null;
-   }
-   
-   private void initialize(){
-       this.data = new NSNEventData(nsnEntity);
-   }
+    public EventChannel(int id, EventInfo nsnEntity) {
+        this.id = id;
+        this.nsnEntity = nsnEntity;
+        this.data = null;
+    }
 
-   @Override
-   public int getId() {
-      return id;
-   }
+    private void initialize() {
+        this.data = new NSNEventData(nsnEntity);
+    }
 
-   @Override
-   public ChannelType getType() {
-      return ChannelType.EVENT;
-   }
-   
-   public void setType(ChannelType type) {
-      
-   }
+    @Override
+    public int getId() {
+        return id;
+    }
 
-   @Override
-   public String getLabel() {
-      return nsnEntity.getEntityInfo().getEntityLabel();
-   }
+    @Override
+    public ChannelType getType() {
+        return ChannelType.EVENT;
+    }
 
-   @Override
-   public void setLabel(String label) {
-   }
+    public void setType(ChannelType type) {
+    }
 
-   @Override
-   public long getItemCount() {
-      return nsnEntity.getEntityInfo().getItemCount();
-   }
+    @Override
+    public String getLabel() {
+        return nsnEntity.getEntityInfo().getEntityLabel();
+    }
 
-   @Override
-   public void setItemCount(long itemCount) {
-   }
+    @Override
+    public void setLabel(String label) {
+        nsnEntity.getEntityInfo().setEntityLabel(label);
+    }
 
-   @Override
-   public String getURI() {
-      return nsnEntity.getEntityInfo().getFilePath();
-   }
+    @Override
+    public long getItemCount() {
+        return nsnEntity.getEntityInfo().getItemCount();
+    }
 
-   public void setURI(String filePath) {
-   }
+    @Override
+    public void setItemCount(long itemCount) {
+        nsnEntity.getEntityInfo().setItemCount(itemCount);
+    }
 
-   @Override
-   public NSNEventData getData() {
-       if(this.data == null){
-           initialize();
-       }
-       return data;
-   }
+    @Override
+    public String getURI() {
+        return nsnEntity.getEntityInfo().getFilePath();
+    }
 
-   /**
-    * @return the eventType
-    */
-   public EventType getEventType() {
-      return nsnEntity.getEventType();
-   }
+    public void setURI(String filePath) {
+    }
 
-   /**
-    * @param eventType the eventType to set
-    */
-   public void setEventType(EventType eventType) {
-      nsnEntity.setEventType(eventType);
-   }
+    @Override
+    public NSNEventData getData() {
+        if (this.data == null) {
+            initialize();
+        }
+        return data;
+    }
 
-   /**
-    * @return the minDataLength
-    */
-   public long getMinDataLength() {
-      return nsnEntity.getMinDataLength();
-   }
+    /**
+     * @return the eventType
+     */
+    public EventType getEventType() {
+        return nsnEntity.getEventType();
+    }
 
-   /**
-    * @param minDataLength the minDataLength to set
-    */
-   public void setMinDataLength(long minDataLength) {
-      nsnEntity.setMinDataLength(minDataLength);
-   }
+    /**
+     * @param eventType the eventType to set
+     */
+    public void setEventType(EventType eventType) {
+        nsnEntity.setEventType(eventType);
+    }
 
-   /**
-    * @return the maxDataLength
-    */
-   public long getMaxDataLength() {
-      return nsnEntity.getMaxDataLength();
-   }
+    /**
+     * @return the minDataLength
+     */
+    public long getMinDataLength() {
+        return nsnEntity.getMinDataLength();
+    }
 
-   /**
-    * @param maxDataLength the maxDataLength to set
-    */
-   public void setMaxDataLength(long maxDataLength) {
-      nsnEntity.setMaxDataLength(maxDataLength);
-   }
+    /**
+     * @param minDataLength the minDataLength to set
+     */
+    public void setMinDataLength(long minDataLength) {
+        nsnEntity.setMinDataLength(minDataLength);
+    }
 
-   /**
-    * @return the csvDesc
-    */
-   public String getCsvDesc() {
-      return nsnEntity.getCsvDesc();
-   }
+    /**
+     * @return the maxDataLength
+     */
+    public long getMaxDataLength() {
+        return nsnEntity.getMaxDataLength();
+    }
 
-   /**
-    * @param csvDesc the csvDesc to set
-    */
-   public void setCsvDesc(String csvDesc) {
-      nsnEntity.setCsvDesc(csvDesc);
-   }
+    /**
+     * @param maxDataLength the maxDataLength to set
+     */
+    public void setMaxDataLength(long maxDataLength) {
+        nsnEntity.setMaxDataLength(maxDataLength);
+    }
 
-   /**
-    * @return the dataPosition
-    */
-   public long getDataPosition() {
-      return nsnEntity.getEntityInfo().getDataPosition();
-   }
+    /**
+     * @return the csvDesc
+     */
+    public String getCsvDesc() {
+        return nsnEntity.getCsvDesc();
+    }
 
-   /**
-    * @param dataPosition the dataPosition to set
-    */
-   public void setDataPosition(long dataPosition) {
-      nsnEntity.getEntityInfo().setDataPosition(dataPosition);
-   }
+    /**
+     * @param csvDesc the csvDesc to set
+     */
+    public void setCsvDesc(String csvDesc) {
+        nsnEntity.setCsvDesc(csvDesc);
+    }
 
-   /**
-    * @return the entityType
-    */
-   public EntityType getEntityType() {
-      return nsnEntity.getEntityInfo().getEntityType();
-   }
+    /**
+     * @return the dataPosition
+     */
+    public long getDataPosition() {
+        return nsnEntity.getEntityInfo().getDataPosition();
+    }
 
-   /**
-    * @param entityType the entityType to set
-    */
-   public void setEntityType(EntityType entityType) {
+    /**
+     * @param dataPosition the dataPosition to set
+     */
+    public void setDataPosition(long dataPosition) {
+        nsnEntity.getEntityInfo().setDataPosition(dataPosition);
+    }
+
+    /**
+     * @return the entityType
+     */
+    public EntityType getEntityType() {
+        return nsnEntity.getEntityInfo().getEntityType();
+    }
+
+    /**
+     * @param entityType the entityType to set
+     */
+    public void setEntityType(EntityType entityType) {
         EntityInfo entityInfo = nsnEntity.getEntityInfo();
         entityInfo.setEntityType(entityType);
         nsnEntity.setEntityInfo(entityInfo);
-   }
+    }
 
-   @Override
-   public String toString() {
-      return getLabel();
-   }
+    @Override
+    public String toString() {
+        return getLabel();
+    }
 }

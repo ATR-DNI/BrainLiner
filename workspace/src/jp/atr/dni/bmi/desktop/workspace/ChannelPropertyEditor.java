@@ -957,10 +957,17 @@ public class ChannelPropertyEditor extends javax.swing.JPanel implements ActionL
 
         if (dialogDescriptor.getValue() == DialogDescriptor.OK_OPTION) {
             // OK : overwrite the channel.
-            // 1. save modified channel information.
-            // 2. update channel.            
+            // 1. check input values.
+            // 2. save modified channel information.
+            // 3. update channel.            
 
-            // 1. save the channel.
+            // 1. check input values.
+            if (!checkChannel()) {
+                JOptionPane.showMessageDialog(null, "Error Value typed!\nAll values are unmodified.", "Save Error", JOptionPane.ERROR_MESSAGE);;
+                return;
+            }
+
+            // 2. save the channel.
             if (!saveChannel()) {
                 JOptionPane.showConfirmDialog(null, "Save Error!", "Save Error", JOptionPane.ERROR_MESSAGE);
                 return;
@@ -970,7 +977,7 @@ public class ChannelPropertyEditor extends javax.swing.JPanel implements ActionL
                 workspace = Lookup.getDefault().lookup(Workspace.class);
             }
 
-            // 2. update channel header.
+            // 3. update channel header.
             workspace.updateChannelHeader(oldChannel, channel);
         }
 
@@ -1078,26 +1085,13 @@ public class ChannelPropertyEditor extends javax.swing.JPanel implements ActionL
         this.dialog.setVisible(true);
     }
 
-    private boolean saveChannel() {
+    private boolean checkChannel() {
 
         // checker is needed to verify input.
         boolean checker = true;
         if (this.channel.getType() == ChannelType.EVENT) {
-
             // EVENT Entity.
-            EventChannel eChannel = (EventChannel) channel;
-            // Set Values.
-            eChannel.setLabel(eventChannelLabel.getText());
-
-//         EntityInfo ei = edittedEntity.getEntityInfo();
-//         ei.setEntityLabel(eventChannelLabel.getText());
-//         edittedEntity.setEntityInfo(ei);
-//
-//         EventInfo evi = (EventInfo) edittedEntity;
-//         evi.setCsvDesc(eventCSVDesc.getText());
-//
-//         this.channel.setEntity((Entity) evi);
-
+            // nothing to check.
         } else if (this.channel.getType() == ChannelType.ANALOG) {
             // ANALOG Entity.
 
@@ -1114,31 +1108,6 @@ public class ChannelPropertyEditor extends javax.swing.JPanel implements ActionL
             checker &= isUnsignedInteger(analogHighFreqOrder.getText());
             checker &= isDouble(analogLowFreqCorner.getText());
             checker &= isUnsignedInteger(analogLowFreqOrder.getText());
-            if (!checker) {
-                return checker;
-            }
-
-            AnalogChannel aChannel = (AnalogChannel) channel;
-
-            // Set Values.
-            this.channel.setLabel(analogChannelLabel.getText());
-
-            aChannel.setSamplingRate(Double.parseDouble(analogSamplingRate.getText()));
-            aChannel.setMinVal(Double.parseDouble(analogMinVal.getText()));
-            aChannel.setMaxVal(Double.parseDouble(analogMaxVal.getText()));
-            aChannel.setUnits(analogUnits.getText());
-            aChannel.setResolution(Double.parseDouble(analogResolution.getText()));
-            aChannel.setLocationX(Double.parseDouble(analogLocationX.getText()));
-            aChannel.setLocationY(Double.parseDouble(analogLocationY.getText()));
-            aChannel.setLocationZ(Double.parseDouble(analogLocationZ.getText()));
-            aChannel.setLocationUser(Double.parseDouble(analogLocationUser.getText()));
-            aChannel.setHighFreqCorner(Double.parseDouble(analogHighFreqCorner.getText()));
-            aChannel.setHighFreqOrder(Long.parseLong(analogHighFreqOrder.getText()));
-            aChannel.setHighFilterType(analogHighFilterType.getText());
-            aChannel.setLowFreqCorner(Double.parseDouble(analogLowFreqCorner.getText()));
-            aChannel.setLowFreqOrder(Long.parseLong(analogLowFreqOrder.getText()));
-            aChannel.setLowFilterType(analogLowFilterType.getText());
-            aChannel.setProbeInfo(analogProbeInfo.getText());
 
         } else if (this.channel.getType() == ChannelType.SEGMENT) {
             // SEGMENT Entity.
@@ -1157,22 +1126,70 @@ public class ChannelPropertyEditor extends javax.swing.JPanel implements ActionL
             checker &= isUnsignedInteger(segmentHighFreqOrder.getText());
             checker &= isDouble(segmentLowFreqCorner.getText());
             checker &= isUnsignedInteger(segmentLowFreqOrder.getText());
-            if (!checker) {
-                return checker;
-            }
 
+
+        } else if (this.channel.getType() == ChannelType.NEURAL_SPIKE) {
+            // NEURALEVENT Entity.
+
+            // Check Values.
+            checker &= isUnsignedInteger(neuralSourceEntityID.getText());
+            checker &= isUnsignedInteger(neuralSourceUnitID.getText());
+
+        } else {
+            // UNKNOWN
+            checker = false;
+        }
+
+        return checker;
+    }
+
+    private boolean saveChannel() {
+
+        // checker is needed to verify input.
+        boolean checker = true;
+        if (this.channel.getType() == ChannelType.EVENT) {
+
+            // EVENT Entity.
+            EventChannel eChannel = (EventChannel) channel;
+            // Set Values.
+            eChannel.setLabel(eventChannelLabel.getText());
+            eChannel.setCsvDesc(eventCSVDesc.getText());
+
+            // Set Entity.
+            this.channel = eChannel;
+
+        } else if (this.channel.getType() == ChannelType.ANALOG) {
+            // ANALOG Entity.
+            AnalogChannel aChannel = (AnalogChannel) channel;
+
+            // Set Values.
+            aChannel.setLabel(analogChannelLabel.getText());
+            aChannel.setSamplingRate(Double.parseDouble(analogSamplingRate.getText()));
+            aChannel.setMinVal(Double.parseDouble(analogMinVal.getText()));
+            aChannel.setMaxVal(Double.parseDouble(analogMaxVal.getText()));
+            aChannel.setUnits(analogUnits.getText());
+            aChannel.setResolution(Double.parseDouble(analogResolution.getText()));
+            aChannel.setLocationX(Double.parseDouble(analogLocationX.getText()));
+            aChannel.setLocationY(Double.parseDouble(analogLocationY.getText()));
+            aChannel.setLocationZ(Double.parseDouble(analogLocationZ.getText()));
+            aChannel.setLocationUser(Double.parseDouble(analogLocationUser.getText()));
+            aChannel.setHighFreqCorner(Double.parseDouble(analogHighFreqCorner.getText()));
+            aChannel.setHighFreqOrder(Long.parseLong(analogHighFreqOrder.getText()));
+            aChannel.setHighFilterType(analogHighFilterType.getText());
+            aChannel.setLowFreqCorner(Double.parseDouble(analogLowFreqCorner.getText()));
+            aChannel.setLowFreqOrder(Long.parseLong(analogLowFreqOrder.getText()));
+            aChannel.setLowFilterType(analogLowFilterType.getText());
+            aChannel.setProbeInfo(analogProbeInfo.getText());
+
+            // Set Entity.
+            this.channel = aChannel;
+
+        } else if (this.channel.getType() == ChannelType.SEGMENT) {
+            // SEGMENT Entity.
             SegmentChannel sChannel = (SegmentChannel) channel;
 
             // Set Values.
-            this.channel.setLabel(segmentChannelLabel.getText());
-
-//         Entity edittedEntity = this.channel.getEntity();
-//         EntityInfo ei = edittedEntity.getEntityInfo();
-//         ei.setEntityLabel(segmentChannelLabel.getText());
-//         edittedEntity.setEntityInfo(ei);
-//
-//         SegmentInfo si = (SegmentInfo) edittedEntity;
-
+            sChannel.setLabel(segmentChannelLabel.getText());
             sChannel.setSamplingRate(Double.parseDouble(segmentSampleRate.getText()));
             sChannel.setUnits(segmentUnit.getText());
             SegmentSourceInfo ssi = sChannel.getSegmentSource(0);
@@ -1193,16 +1210,13 @@ public class ChannelPropertyEditor extends javax.swing.JPanel implements ActionL
             ssi.setLowFilterType(segmentLowFilterType.getText());
             ssi.setProbeInfo(segmentProbeInfo.getText());
 
+            sChannel.setSegmentSource(0, ssi);
+
+            // Set Entity.
+            this.channel = sChannel;
+
         } else if (this.channel.getType() == ChannelType.NEURAL_SPIKE) {
             // NEURALEVENT Entity.
-
-            // Check Values.
-            checker &= isUnsignedInteger(neuralSourceEntityID.getText());
-            checker &= isUnsignedInteger(neuralSourceUnitID.getText());
-            if (!checker) {
-                return checker;
-            }
-
             NeuralSpikeChannel nChannel = (NeuralSpikeChannel) channel;
 
             // Set Values.
@@ -1210,6 +1224,9 @@ public class ChannelPropertyEditor extends javax.swing.JPanel implements ActionL
             nChannel.setSourceEntityID(Long.parseLong(neuralSourceEntityID.getText()));
             nChannel.setSourceUnitID(Long.parseLong(neuralSourceUnitID.getText()));
             nChannel.setProbeInfo(neuralProbeInfo.getText());
+
+            // Set Entity.
+            this.channel = nChannel;
 
         } else {
             // UNKNOWN

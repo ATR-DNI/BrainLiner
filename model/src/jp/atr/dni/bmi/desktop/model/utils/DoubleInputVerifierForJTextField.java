@@ -27,8 +27,6 @@ public class DoubleInputVerifierForJTextField extends InputVerifier {
         } catch (NumberFormatException numberFormatException) {
             JOptionPane.showMessageDialog(null, "The value is not correct. Input a correct value.\nCorrect value : Double between 4.9E-324 and 1.7E308  ", "Input Value Error", JOptionPane.ERROR_MESSAGE);
             UIManager.getLookAndFeel().provideErrorFeedback(input);
-            tf.setText("0");
-
         }
         return verified;
     }

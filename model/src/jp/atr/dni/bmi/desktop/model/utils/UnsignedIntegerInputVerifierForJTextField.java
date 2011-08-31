@@ -26,7 +26,6 @@ public class UnsignedIntegerInputVerifierForJTextField extends InputVerifier {
             if (it < 0) {
                 JOptionPane.showMessageDialog(null, "The value is not correct. Input a correct value.\nCorrect value : Integer between 0 and 2147483647  ", "Input Value Error", JOptionPane.ERROR_MESSAGE);
                 UIManager.getLookAndFeel().provideErrorFeedback(input);
-                tf.setText("0");   
             }
             else{
                 verified = true;
@@ -34,7 +33,6 @@ public class UnsignedIntegerInputVerifierForJTextField extends InputVerifier {
         } catch (NumberFormatException numberFormatException) {
             JOptionPane.showMessageDialog(null, "The value is not correct. Input a correct value.\nCorrect value : Integer between 0 and 2147483647  ", "Input Value Error", JOptionPane.ERROR_MESSAGE);
             UIManager.getLookAndFeel().provideErrorFeedback(input);
-            tf.setText("0");
         }
         return verified;
 

@@ -28,7 +28,6 @@ public class IntegerInputVerifierForJTextField extends InputVerifier {
 
             JOptionPane.showMessageDialog(null, "The value is not correct. Input a correct value.\nCorrect value : Integer between -2147483648 and 2147483647  ", "Input Value Error", JOptionPane.ERROR_MESSAGE);
             UIManager.getLookAndFeel().provideErrorFeedback(input);
-            tf.setText("0");
         }
         return verified;
     }

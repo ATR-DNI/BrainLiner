@@ -154,7 +154,8 @@ public class CreateNewNeuroshareFile {
                         // ns_EVENT_DWORD
 //                                    rtnval2 = nsEd.addEventData(tLData.getTimeStamp(ii), (Integer) (tLData.getValue(ii)));
                         NSNEvent event = timeLabelData.getEvents().get(ii);
-                        rtnval2 = nsEd.addEventData(event.getTimestamp(), Integer.parseInt((String) event.getValue()));
+//                        rtnval2 = nsEd.addEventData(event.getTimestamp(), Integer.parseInt((String) event.getValue()));
+                        rtnval2 = nsEd.addEventData(event.getTimestamp(), ((Long) event.getValue()).intValue());
                         if (rtnval2 != 0) {
                             // add error. - input arg error - or intermediate file i/o error.
                         }
