@@ -24,6 +24,7 @@
         </folder>
         <folder name="Window">
             <file name="CloneDocumentAction.shadow_hidden"/>
+            <file name="DummyModule1Action.shadow_hidden"/>
             <file name="Output_hidden"/>
             <file name="ProgressListAction.shadow_hidden"/>
             <file name="SwitchToRecentDocumentAction.shadow_hidden"/>
