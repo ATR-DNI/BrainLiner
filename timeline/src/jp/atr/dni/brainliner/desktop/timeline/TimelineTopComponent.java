@@ -636,7 +636,7 @@ public final class TimelineTopComponent extends TopComponent implements GLEventL
             //TODO: add ability to draw data after gaps!
             APIList<Double> vals = ((NSNAnalogData) vc.getData()).getValues().get(0);
 
-            double prevX = minPoint.getX() > 1 ? (int) minPoint.getX() : 0;// minPoint.getX() > 2 ? (int) ((minPoint.getX() - 1)) : 0;
+            double prevX =0;// minPoint.getX() > 1 ? (int) minPoint.getX() : 0;// minPoint.getX() > 2 ? (int) ((minPoint.getX() - 1)) : 0;
             prevX *= timeIncrement;
             prevX = ((int) prevX) % 2 == 0 ? prevX : prevX - 1;
 
