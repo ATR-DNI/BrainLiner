@@ -35,9 +35,9 @@ public class NSNEventData {
      */
     public NSNEventData(int ID, String szEntityLabel, EventType eventType) {
 
-        this.intermediateFileNameForInfo = ConstantValues.FN_HEADER + ConstantValues.EVENT
+        this.intermediateFileNameForInfo = ConstantValues.USERHOMEDIRPATH + File.separator + ConstantValues.TEMPDIRNAME + File.separator + ConstantValues.FN_HEADER + ConstantValues.EVENT
                 + "_" + ID + ".eventInfo";
-        this.intermediateFileNameForData = ConstantValues.FN_HEADER + ConstantValues.EVENT
+        this.intermediateFileNameForData = ConstantValues.USERHOMEDIRPATH + File.separator + ConstantValues.TEMPDIRNAME + File.separator + ConstantValues.FN_HEADER + ConstantValues.EVENT
                 + "_" + ID + ".eventData";
         this.tagElement = new NSNTagElement(NSNEntityType.EVENT);
         this.entityInfo = new NSNEntityInfo(szEntityLabel, NSNEntityType.EVENT);

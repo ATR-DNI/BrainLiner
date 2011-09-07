@@ -39,11 +39,11 @@ public class NSNSegmentData {
      */
     public NSNSegmentData(int ID, String szEntityLabel) {
 
-        this.intermediateFileNameForInfo = ConstantValues.FN_HEADER + ConstantValues.SEGMENT
+        this.intermediateFileNameForInfo = ConstantValues.USERHOMEDIRPATH + File.separator + ConstantValues.TEMPDIRNAME + File.separator + ConstantValues.FN_HEADER + ConstantValues.SEGMENT
                 + "_" + ID + ".segmentInfo";
-        this.intermediateFileNameForSourceInfo = ConstantValues.FN_HEADER + ConstantValues.SEGMENT
+        this.intermediateFileNameForSourceInfo = ConstantValues.USERHOMEDIRPATH + File.separator + ConstantValues.TEMPDIRNAME + File.separator + ConstantValues.FN_HEADER + ConstantValues.SEGMENT
                 + "_" + ID + ".segmentSourceInfo";
-        this.intermediateFileNameForData = ConstantValues.FN_HEADER + ConstantValues.SEGMENT
+        this.intermediateFileNameForData = ConstantValues.USERHOMEDIRPATH + File.separator + ConstantValues.TEMPDIRNAME + File.separator + ConstantValues.FN_HEADER + ConstantValues.SEGMENT
                 + "_" + ID + ".segmentData";
         this.segmentID = ID;
         this.tagElement = new NSNTagElement(NSNEntityType.SEGMENT);

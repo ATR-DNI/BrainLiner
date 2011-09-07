@@ -33,9 +33,9 @@ public class NSNNeuralEventData {
      */
     public NSNNeuralEventData(int ID, String szEntityLabel) {
 
-        this.intermediateFileNameForInfo = ConstantValues.FN_HEADER + ConstantValues.NEURAL
+        this.intermediateFileNameForInfo = ConstantValues.USERHOMEDIRPATH + File.separator + ConstantValues.TEMPDIRNAME + File.separator + ConstantValues.FN_HEADER + ConstantValues.NEURAL
                 + "_" + ID + ".neuralEventInfo";
-        this.intermediateFileNameForData = ConstantValues.FN_HEADER + ConstantValues.NEURAL
+        this.intermediateFileNameForData = ConstantValues.USERHOMEDIRPATH + File.separator + ConstantValues.TEMPDIRNAME + File.separator + ConstantValues.FN_HEADER + ConstantValues.NEURAL
                 + "_" + ID + ".neuralEventData";
         this.tagElement = new NSNTagElement(NSNEntityType.NEURAL);
         this.entityInfo = new NSNEntityInfo(szEntityLabel, NSNEntityType.NEURAL);
