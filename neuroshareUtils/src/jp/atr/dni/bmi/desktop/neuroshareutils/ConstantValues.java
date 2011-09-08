@@ -165,7 +165,7 @@ public class ConstantValues {
     /**
      *
      */
-    public static final String TEMPDIRNAME = "brainliner_tmp";
+    public static final String TEMPDIRNAME = ".brainliner_tmp";
     /**
      *
      */

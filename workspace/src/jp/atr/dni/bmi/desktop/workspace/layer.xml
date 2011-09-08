@@ -31,6 +31,7 @@
             <file name="WorkspaceAction.shadow">
                 <attr name="originalFile" stringvalue="Actions/Window/jp-atr-dni-bmi-desktop-workspace-WorkspaceAction.instance"/>
             </file>
+            <file name="jp-atr-dni-bmi-desktop-preprocessing-PreprocessingTopComponent.shadow_hidden"/>
         </folder>
     </folder>
     <folder name="Services">
