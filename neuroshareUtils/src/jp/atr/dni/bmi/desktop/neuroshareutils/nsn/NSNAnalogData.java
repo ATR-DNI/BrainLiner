@@ -34,9 +34,9 @@ public class NSNAnalogData {
      */
     public NSNAnalogData(int ID, String szEntityLabel) {
 
-        this.intermediateFileNameForInfo = ConstantValues.FN_HEADER + ConstantValues.ANALOG
+        this.intermediateFileNameForInfo = ConstantValues.USERHOMEDIRPATH + File.separator + ConstantValues.TEMPDIRNAME + File.separator + ConstantValues.FN_HEADER + ConstantValues.ANALOG
                 + "_" + ID + ".analogInfo";
-        this.intermediateFileNameForData = ConstantValues.FN_HEADER + ConstantValues.ANALOG
+        this.intermediateFileNameForData = ConstantValues.USERHOMEDIRPATH + File.separator + ConstantValues.TEMPDIRNAME + File.separator + ConstantValues.FN_HEADER + ConstantValues.ANALOG
                 + "_" + ID + ".analogData";
         this.tagElement = new NSNTagElement(NSNEntityType.ANALOG);
         this.entityInfo = new NSNEntityInfo(szEntityLabel, NSNEntityType.ANALOG);

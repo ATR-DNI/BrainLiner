@@ -35,7 +35,7 @@ public class NSNCreateFile {
      * @param outputFileName
      */
     public NSNCreateFile(String outputFileName) {
-        this.intermediateFileNameForInfo = ConstantValues.FN_HEADER + ConstantValues.FILE
+        this.intermediateFileNameForInfo = ConstantValues.USERHOMEDIRPATH + File.separator + ConstantValues.TEMPDIRNAME + File.separator + ConstantValues.FN_HEADER + ConstantValues.FILE
                 + ".fileInfo";
         this.outputFileName = outputFileName;
         this.sMagicCode = ConstantValues.MAGICCODE;
